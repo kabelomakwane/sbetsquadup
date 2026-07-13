@@ -2,6 +2,7 @@ import { PillButton } from "@/components/PillButton";
 import { PillInput } from "@/components/PillInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
 import { ScoreBug } from "@/components/ScoreBug";
+import { Timer, type TimerState } from "@/components/Timer";
 import { TabGroup } from "@/components/TabGroup";
 import { StatValuePill } from "@/components/StatValuePill";
 import { ErrorChip } from "@/components/ErrorChip";
@@ -9,6 +10,7 @@ import type { Position, Side } from "@/components/types";
 
 const positions: Position[] = ["ST", "MID", "DEF", "GK"];
 const sides: Side[] = ["home", "away"];
+const timerStates: TimerState[] = ["default", "half-time", "full-time", "paused"];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -98,7 +100,25 @@ export default function DesignSystemPage() {
       </Section>
 
       <Section title="Score bug">
-        <ScoreBug homeTeamName="Ballerz FC" awayTeamName="One Touch United" homeScore={2} awayScore={1} />
+        <ScoreBug
+          homeTeamName="Ballerz FC"
+          awayTeamName="One Touch United"
+          homeScore={2}
+          awayScore={1}
+          time="12:34"
+        />
+        <ScoreBug
+          homeTeamName="Pick A Team Name"
+          awayTeamName="Pick A Team Name"
+          showScores={false}
+          showTimer={false}
+        />
+      </Section>
+
+      <Section title="Timer">
+        {timerStates.map((state) => (
+          <Timer key={state} state={state} time="12:34" />
+        ))}
       </Section>
 
       <Section title="Tab group">
