@@ -23,7 +23,7 @@ export function TabGroup({ tabs, defaultTab, onChange }: TabGroupProps) {
           key={tab}
           type="button"
           onClick={() => select(tab)}
-          className={`font-button rounded-pill px-5 py-2 text-sm uppercase italic transition-colors ${
+          className={`font-button text-cap-trim rounded-pill px-5 py-2 text-sm uppercase italic transition-colors ${
             active === tab ? "bg-white text-brand-blue" : "text-white"
           }`}
         >
