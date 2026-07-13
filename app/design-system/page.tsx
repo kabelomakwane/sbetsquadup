@@ -1,7 +1,7 @@
 import { Heading } from "@/components/Heading";
 import { Text } from "@/components/Text";
 import { PillButton } from "@/components/PillButton";
-import { PillInput } from "@/components/PillInput";
+import { PillInput, type PillInputOption } from "@/components/PillInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
@@ -23,6 +23,11 @@ const buttonVariants = [
   { size: "small", disabled: false },
   { size: "small", disabled: true },
 ] as const;
+const samplePlayerOptions: PillInputOption[] = [
+  { id: "1", label: "Erling Haaland" },
+  { id: "2", label: "Kylian Mbappé" },
+  { id: "3", label: "Bukayo Saka" },
+];
 
 function DemoIcon() {
   return (
@@ -167,6 +172,29 @@ export default function DesignSystemPage() {
           <PillInput position="MID" side="away" value="Wayne Rooney" readOnly />
           <PillInput position="DEF" side="away" value="Sergio Ramos" readOnly />
           <PillInput position="GK" side="away" value="Lev Yashin" readOnly />
+        </div>
+      </Section>
+
+      <Section title="Pill input — active state (dropdown)">
+        <div className="flex w-full max-w-sm flex-col gap-3 pb-48">
+          <PillInput
+            position="ST"
+            side="home"
+            value=""
+            active
+            options={samplePlayerOptions}
+            readOnly
+          />
+        </div>
+        <div className="flex w-full max-w-sm flex-col gap-3 pb-48">
+          <PillInput
+            position="ST"
+            side="away"
+            value=""
+            active
+            options={samplePlayerOptions}
+            readOnly
+          />
         </div>
       </Section>
 
