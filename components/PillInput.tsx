@@ -25,7 +25,7 @@ export function PillInput({
   return (
     <div className={`flex h-12 w-full items-center rounded-pill-input bg-white ${className}`}>
       <span
-        className={`font-tag text-cap-trim flex w-[52px] shrink-0 items-center justify-center text-base font-bold not-italic ${tagColor[side]}`}
+        className={`font-tag flex w-[52px] shrink-0 items-center justify-center text-base font-bold not-italic ${tagColor[side]}`}
       >
         {position}
       </span>

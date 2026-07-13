@@ -30,7 +30,7 @@ export function PillButton({
     <button
       type="button"
       disabled={disabled}
-      className={`font-button text-cap-trim rounded-pill uppercase italic transition-opacity ${colorStyles[color]} ${sizeStyles[size]} ${disabled ? "opacity-50" : ""} ${className}`}
+      className={`font-button rounded-pill uppercase italic transition-opacity ${colorStyles[color]} ${sizeStyles[size]} ${disabled ? "opacity-50" : ""} ${className}`}
       {...props}
     />
   );

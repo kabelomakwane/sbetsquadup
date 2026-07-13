@@ -48,17 +48,6 @@
   --font-body: var(--font-body);
 }
 
-/*
- * Trims a text box's vertical metrics down to cap-height/baseline,
- * removing the font's default ascender/descender padding. Apply to
- * all-caps text (headings, buttons, tags) so it sits tight instead of
- * with extra leading above/below.
- */
-@utility text-cap-trim {
-  text-box-trim: trim-both;
-  text-box-edge: cap alphabetic;
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

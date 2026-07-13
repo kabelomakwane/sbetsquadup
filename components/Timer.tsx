@@ -22,7 +22,7 @@ export function Timer({ state = "default", time = "00:00" }: TimerProps) {
       }`}
     >
       <p
-        className={`font-tag text-cap-trim text-2xl font-bold not-italic uppercase ${
+        className={`font-tag text-2xl font-bold not-italic uppercase ${
           isPaused ? "text-white" : "text-brand-blue"
         }`}
       >

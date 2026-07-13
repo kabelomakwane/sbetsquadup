@@ -27,7 +27,7 @@ export function ScoreBug({
       <div className="flex items-center justify-center gap-3 rounded-bl-[32px] rounded-br-[32px] bg-brand-blue p-2">
         <div className="flex items-center overflow-hidden rounded-tr-[24px] rounded-bl-[24px]">
           <div className="flex w-[300px] items-center justify-center bg-brand-red px-3 py-4">
-            <p className="font-display text-cap-trim truncate text-2xl italic uppercase text-white">
+            <p className="font-display truncate text-2xl italic uppercase text-white">
               {homeTeamName}
             </p>
           </div>
@@ -49,7 +49,7 @@ export function ScoreBug({
             </div>
           )}
           <div className="flex w-[300px] items-center justify-center bg-brand-yellow px-3 py-4">
-            <p className="font-display text-cap-trim truncate text-2xl italic uppercase text-brand-blue">
+            <p className="font-display truncate text-2xl italic uppercase text-brand-blue">
               {awayTeamName}
             </p>
           </div>
