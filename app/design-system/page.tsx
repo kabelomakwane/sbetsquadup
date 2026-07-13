@@ -22,13 +22,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function DesignSystemPage() {
   return (
-    <main
-      className="flex flex-1 flex-col items-center gap-12 px-8 py-16"
-      style={{
-        background:
-          "linear-gradient(180deg, var(--color-brand-blue), var(--color-brand-blue-end))",
-      }}
-    >
+    <main className="flex flex-1 flex-col items-center gap-12 px-8 py-16">
       <h1 className="font-display text-cap-trim text-3xl font-black uppercase italic text-white">Design System</h1>
 
       <Section title="Pill button">

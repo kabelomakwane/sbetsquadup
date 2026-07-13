@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Background } from "@/components/Background";
 import { superSportExtra, superSportHD, superSportSD } from "./fonts";
 import "./globals.css";
 
@@ -23,7 +24,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${superSportExtra.variable} ${superSportHD.variable} ${superSportSD.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body">{children}</body>
+      <body className="min-h-full flex flex-col font-body">
+        <Background />
+        {children}
+      </body>
     </html>
   );
 }
