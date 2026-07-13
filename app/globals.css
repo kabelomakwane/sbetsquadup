@@ -12,6 +12,11 @@
   --color-white-75: rgba(255, 255, 255, 0.75);
   --color-black-60: rgba(0, 0, 0, 0.6);
 
+  /* Disabled-state button fills — Figma node 99:467 */
+  --color-brand-red-disabled: #83110d;
+  --color-brand-yellow-disabled: #91771d;
+  --color-brand-blue-disabled: #0a1362;
+
   --radius-pill: 999px;
   --radius-pill-input: 64px;
 
@@ -37,6 +42,9 @@
   --color-brand-yellow: var(--color-brand-yellow);
   --color-white-75: var(--color-white-75);
   --color-black-60: var(--color-black-60);
+  --color-brand-red-disabled: var(--color-brand-red-disabled);
+  --color-brand-yellow-disabled: var(--color-brand-yellow-disabled);
+  --color-brand-blue-disabled: var(--color-brand-blue-disabled);
 
   --radius-pill: var(--radius-pill);
   --radius-pill-input: var(--radius-pill-input);

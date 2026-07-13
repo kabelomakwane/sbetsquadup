@@ -16,6 +16,27 @@ const headingLevels = [1, 2, 3, 4, 5, 6] as const;
 const bodyTextSizes = ["large", "medium", "regular", "small"] as const;
 const superSportWeights = ["extrabold", "bold", "normal"] as const;
 const interWeights = ["extrabold", "bold", "semibold", "medium", "normal", "light"] as const;
+const buttonStyles = ["primary", "secondary", "tertiary", "link"] as const;
+const buttonVariants = [
+  { size: "regular", disabled: false },
+  { size: "regular", disabled: true },
+  { size: "small", disabled: false },
+  { size: "small", disabled: true },
+] as const;
+
+function DemoIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 12l4 4L19 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -63,15 +84,50 @@ export default function DesignSystemPage() {
       </Section>
 
       <Section title="Pill button">
-        <PillButton color="red">Randomise</PillButton>
-        <PillButton color="blue">Clear</PillButton>
-        <PillButton color="yellow">Randomise</PillButton>
-        <PillButton color="red" size="lg">
-          Kick Off
-        </PillButton>
-        <PillButton color="red" size="lg" disabled>
-          Kick Off
-        </PillButton>
+        <div className="flex w-full flex-col gap-10">
+          {buttonStyles.map((buttonStyle) => (
+            <div key={buttonStyle} className="flex flex-col gap-3">
+              <Text size="small" weight="bold" className="capitalize">
+                {buttonStyle}
+              </Text>
+              <div className="flex flex-col gap-3">
+                {buttonVariants.map(({ size, disabled }) => (
+                  <div key={`${size}-${disabled}`} className="flex flex-wrap items-center gap-3">
+                    <PillButton buttonStyle={buttonStyle} size={size} disabled={disabled}>
+                      Button
+                    </PillButton>
+                    <PillButton
+                      buttonStyle={buttonStyle}
+                      size={size}
+                      disabled={disabled}
+                      icon={<DemoIcon />}
+                      iconPosition="leading"
+                    >
+                      Button
+                    </PillButton>
+                    <PillButton
+                      buttonStyle={buttonStyle}
+                      size={size}
+                      disabled={disabled}
+                      icon={<DemoIcon />}
+                      iconPosition="trailing"
+                    >
+                      Button
+                    </PillButton>
+                    <PillButton
+                      buttonStyle={buttonStyle}
+                      size={size}
+                      disabled={disabled}
+                      icon={<DemoIcon />}
+                      iconPosition="only"
+                      aria-label="Button"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </Section>
 
       <Section title="Pill input — empty state">
