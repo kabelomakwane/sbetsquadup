@@ -77,7 +77,7 @@ export function PillButton({
     <button
       type="button"
       disabled={disabled}
-      className={`font-button inline-flex items-center justify-center whitespace-nowrap text-base uppercase italic transition-opacity ${
+      className={`font-display inline-flex items-center justify-center whitespace-nowrap text-base font-black italic transition-opacity ${
         isLink ? "" : "rounded-pill"
       } ${bgClass} ${textClass} ${paddingClass} ${icon && !isIconOnly ? gapClass : ""} ${className}`}
       {...props}
