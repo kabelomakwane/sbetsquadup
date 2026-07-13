@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { superSportExtra, superSportHD, superSportSD } from "./fonts";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,7 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${superSportExtra.variable} ${superSportHD.variable} ${superSportSD.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col font-body">{children}</body>
     </html>
   );

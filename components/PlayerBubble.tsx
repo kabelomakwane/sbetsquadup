@@ -36,7 +36,7 @@ export function PlayerBubble(props: PlayerBubbleProps) {
         }`}
       >
         <span
-          className={`font-display text-[15px] ${
+          className={`font-label text-[15px] font-black not-italic ${
             props.state === "empty" ? "text-white" : filledTextColor[side]
           }`}
         >
@@ -44,7 +44,7 @@ export function PlayerBubble(props: PlayerBubbleProps) {
         </span>
       </div>
       {props.state === "filled" && (
-        <p className="font-display text-sm text-white">{props.playerName}</p>
+        <p className="font-display text-sm font-black italic text-white">{props.playerName}</p>
       )}
     </div>
   );

@@ -13,7 +13,7 @@ const sides: Side[] = ["home", "away"];
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex w-full max-w-4xl flex-col gap-4">
-      <h2 className="font-display text-xl uppercase italic text-white">{title}</h2>
+      <h2 className="font-display text-xl font-black uppercase italic text-white">{title}</h2>
       <div className="flex flex-wrap items-center gap-4 rounded-2xl bg-black/10 p-6">{children}</div>
     </section>
   );
@@ -28,7 +28,7 @@ export default function DesignSystemPage() {
           "linear-gradient(180deg, var(--color-brand-blue), var(--color-brand-blue-end))",
       }}
     >
-      <h1 className="font-display text-3xl uppercase italic text-white">Design System</h1>
+      <h1 className="font-display text-3xl font-black uppercase italic text-white">Design System</h1>
 
       <Section title="Pill button">
         <PillButton color="red">Randomise</PillButton>

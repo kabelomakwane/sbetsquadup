@@ -14,7 +14,7 @@ const sideColor: Record<StatValueSide, string> = {
 export function StatValuePill({ value, side }: StatValuePillProps) {
   return (
     <span
-      className={`inline-flex min-w-12 items-center justify-center rounded-pill px-3 py-1 font-tag text-sm text-white ${sideColor[side]}`}
+      className={`inline-flex min-w-12 items-center justify-center rounded-pill px-3 py-1 font-tag text-sm font-bold not-italic text-white ${sideColor[side]}`}
     >
       {value}
     </span>

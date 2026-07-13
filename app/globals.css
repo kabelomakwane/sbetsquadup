@@ -16,13 +16,14 @@
   --radius-pill-input: 64px;
 
   /*
-   * SuperSport font files aren't sourced yet (see CLAUDE.md "Known gaps").
-   * These fall back to system font stacks that approximate the intended
-   * weight/style until real font files are added.
+   * SuperSport Extra ships one weight (900) in two cuts: upright and
+   * italic. font-display and font-label both point at it — pair with
+   * Tailwind's italic/not-italic utility for the cut you need.
    */
-  --font-display: "Arial Black", var(--font-inter), sans-serif;
-  --font-button: var(--font-inter), sans-serif;
-  --font-tag: var(--font-inter), sans-serif;
+  --font-display: var(--font-supersport-extra), sans-serif;
+  --font-label: var(--font-supersport-extra), sans-serif;
+  --font-tag: var(--font-supersport-hd), sans-serif;
+  --font-button: var(--font-supersport-sd), sans-serif;
   --font-body: var(--font-inter), sans-serif;
 }
 
@@ -41,8 +42,9 @@
   --radius-pill-input: var(--radius-pill-input);
 
   --font-display: var(--font-display);
-  --font-button: var(--font-button);
+  --font-label: var(--font-label);
   --font-tag: var(--font-tag);
+  --font-button: var(--font-button);
   --font-body: var(--font-body);
 }
 
