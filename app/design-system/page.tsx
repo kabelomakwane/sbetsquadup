@@ -6,10 +6,9 @@ import { Timer, type TimerState } from "@/components/Timer";
 import { TabGroup } from "@/components/TabGroup";
 import { StatValuePill } from "@/components/StatValuePill";
 import { ErrorChip } from "@/components/ErrorChip";
-import type { Position, Side } from "@/components/types";
+import type { Position } from "@/components/types";
 
 const positions: Position[] = ["ST", "MID", "DEF", "GK"];
-const sides: Side[] = ["home", "away"];
 const timerStates: TimerState[] = ["default", "half-time", "full-time", "paused"];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -85,11 +84,9 @@ export default function DesignSystemPage() {
       </Section>
 
       <Section title="Player bubble — position-code state">
-        {sides.map((side) =>
-          positions.map((position) => (
-            <PlayerBubble key={`bubble-empty-${side}-${position}`} state="empty" side={side} position={position} />
-          )),
-        )}
+        {positions.map((position) => (
+          <PlayerBubble key={`bubble-empty-${position}`} state="empty" position={position} />
+        ))}
       </Section>
 
       <Section title="Player bubble — initials-monogram state">
