@@ -1,3 +1,5 @@
+import { Heading } from "@/components/Heading";
+import { Text } from "@/components/Text";
 import { PillButton } from "@/components/PillButton";
 import { PillInput } from "@/components/PillInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
@@ -10,11 +12,15 @@ import type { Position } from "@/components/types";
 
 const positions: Position[] = ["ST", "MID", "DEF", "GK"];
 const timerStates: TimerState[] = ["default", "half-time", "full-time", "paused"];
+const headingLevels = [1, 2, 3, 4, 5, 6] as const;
+const bodyTextSizes = ["large", "medium", "regular", "small"] as const;
+const superSportWeights = ["extrabold", "bold", "normal"] as const;
+const interWeights = ["extrabold", "bold", "semibold", "medium", "normal", "light"] as const;
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex w-full max-w-4xl flex-col gap-4">
-      <h2 className="font-display text-xl font-black uppercase italic text-white">{title}</h2>
+      <Heading level={5}>{title}</Heading>
       <div className="flex flex-wrap items-center gap-4 rounded-2xl bg-black/10 p-6">{children}</div>
     </section>
   );
@@ -23,7 +29,38 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function DesignSystemPage() {
   return (
     <main className="flex flex-1 flex-col items-center gap-12 px-8 py-16">
-      <h1 className="font-display text-3xl font-black uppercase italic text-white">Design System</h1>
+      <Heading level={1}>Design System</Heading>
+
+      <Section title="Typography — headings">
+        <div className="flex w-full flex-col gap-6">
+          {headingLevels.map((level) => (
+            <Heading key={level} level={level}>
+              Heading {level}
+            </Heading>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Typography — text">
+        <div className="flex w-full flex-col gap-8">
+          {bodyTextSizes.map((size) => (
+            <div key={size} className="flex flex-col gap-2">
+              {superSportWeights.map((weight) => (
+                <Text key={weight} size={size} weight={weight}>
+                  {`Text ${size} — ${weight}`}
+                </Text>
+              ))}
+            </div>
+          ))}
+          <div className="flex flex-col gap-2">
+            {interWeights.map((weight) => (
+              <Text key={weight} size="tiny" weight={weight}>
+                {`Text tiny — ${weight}`}
+              </Text>
+            ))}
+          </div>
+        </div>
+      </Section>
 
       <Section title="Pill button">
         <PillButton color="red">Randomise</PillButton>
@@ -119,12 +156,16 @@ export default function DesignSystemPage() {
       <Section title="Stat value pill">
         <div className="flex items-center gap-3">
           <StatValuePill value="14" side="home" />
-          <span className="font-body text-sm text-white-75">Shots</span>
+          <Text as="span" size="small" muted>
+            Shots
+          </Text>
           <StatValuePill value="9" side="away" />
         </div>
         <div className="flex items-center gap-3">
           <StatValuePill value="58%" side="home" />
-          <span className="font-body text-sm text-white-75">Possession</span>
+          <Text as="span" size="small" muted>
+            Possession
+          </Text>
           <StatValuePill value="42%" side="none" />
         </div>
       </Section>
