@@ -49,7 +49,7 @@ export function PlayerInput({
   const showUnmatched = focused && options.length === 0 && value.trim().length > 0 && Boolean(onUseUnmatched);
 
   return (
-    <div className={`flex w-full flex-col gap-2 ${className}`}>
+    <div className={`relative flex w-full flex-col ${className}`}>
       <div className="flex h-12 w-full items-center rounded-pill bg-white">
         <span
           className={`font-label flex w-[52px] shrink-0 items-center justify-center px-3 text-base font-black not-italic ${tagColor[side]}`}
@@ -75,7 +75,7 @@ export function PlayerInput({
         />
       </div>
       {isOpen && (
-        <ul className="flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1">
+        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1 shadow-lg">
           {options.map((option) => (
             <li key={option.id}>
               <button
@@ -96,7 +96,7 @@ export function PlayerInput({
         </ul>
       )}
       {showUnmatched && (
-        <ul className="flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1">
+        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1 shadow-lg">
           <li>
             <button
               type="button"

@@ -87,3 +87,13 @@ export function getPlayerInitials(name: string): string {
     .join("")
     .slice(0, 3);
 }
+
+/**
+ * Pitch bubble caption format from the Figma-verified design-system samples:
+ * "Erling Haaland" -> "E. Haaland", "Virgil van Dijk" -> "V. van Dijk".
+ */
+export function getShortPlayerName(name: string): string {
+  const words = name.trim().split(/\s+/);
+  if (words.length <= 1) return name.trim();
+  return `${words[0][0]}. ${words.slice(1).join(" ")}`;
+}
