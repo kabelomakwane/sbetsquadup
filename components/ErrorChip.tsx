@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-type ErrorChipVariant = "foul" | "yellowCard" | "redCard";
+export type ErrorChipVariant = "foul" | "yellowCard" | "redCard";
 
 interface ErrorChipProps {
   variant: ErrorChipVariant;

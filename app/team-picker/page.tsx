@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heading } from "@/components/Heading";
 import { PillButton } from "@/components/PillButton";
+import { ErrorChip } from "@/components/ErrorChip";
 import { Field, type TeamSlots } from "@/components/Field";
 import { getSession } from "@/lib/auth";
 import { getPlayerInitials, getShortPlayerName } from "@/lib/data/players";
 import { POSITION_SLOTS, type Team } from "@/lib/types";
 import { useSquadUpStore } from "@/store/useSquadUpStore";
-import { SquadColumn } from "./SquadColumn";
+import { SquadColumn, type PickError } from "./SquadColumn";
 
 // index 0..4 of POSITION_SLOTS (ST, MID, MID, DEF, GK) maps onto Field's named slots.
 function teamToSlots(team: Team): TeamSlots {
@@ -26,6 +28,7 @@ export default function TeamPickerPage() {
   const router = useRouter();
   const homeTeam = useSquadUpStore((state) => state.homeTeam);
   const awayTeam = useSquadUpStore((state) => state.awayTeam);
+  const [pickError, setPickError] = useState<PickError | null>(null);
 
   const isComplete =
     homeTeam.players.every(Boolean) && awayTeam.players.every(Boolean);
@@ -50,16 +53,17 @@ export default function TeamPickerPage() {
         it's the minimum "Pick A Team Name" needs before it starts clipping.
       */}
       <div className="grid w-full max-w-[1376px] grid-cols-1 gap-8 xl:grid-cols-[minmax(256px,256fr)_minmax(400px,800fr)_minmax(256px,256fr)]">
-        <SquadColumn side="home" />
+        <SquadColumn side="home" onError={setPickError} />
         <div className="flex h-full w-full items-center justify-center">
           <Field home={teamToSlots(homeTeam)} away={teamToSlots(awayTeam)} />
         </div>
-        <SquadColumn side="away" />
+        <SquadColumn side="away" onError={setPickError} />
       </div>
 
       <PillButton buttonStyle="primary" disabled={!isComplete} onClick={handleKickOff}>
         Kick Off
       </PillButton>
+      {pickError && <ErrorChip variant={pickError.variant} message={pickError.message} />}
     </main>
   );
 }

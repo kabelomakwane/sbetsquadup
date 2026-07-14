@@ -4,14 +4,14 @@ import { useState } from "react";
 import { PlayerInput, type PlayerOption } from "@/components/PlayerInput";
 import { TeamInput } from "@/components/TeamInput";
 import { PillButton } from "@/components/PillButton";
-import { ErrorChip } from "@/components/ErrorChip";
+import type { ErrorChipVariant } from "@/components/ErrorChip";
 import { useSquadUpStore } from "@/store/useSquadUpStore";
 import { POSITION_SLOTS, type Player, type Side, type Team } from "@/lib/types";
 import { STUB_PLAYERS, normalizePlayerName, playersById, searchPlayers } from "@/lib/data/players";
 import { containsProfanity } from "@/lib/data/profanity";
 
-interface SlotError {
-  kind: "duplicate" | "profanity";
+export interface PickError {
+  variant: ErrorChipVariant;
   message: string;
 }
 
@@ -36,9 +36,10 @@ const randomiseStyle: Record<Side, "primary" | "secondary"> = {
 
 interface SquadColumnProps {
   side: Side;
+  onError: (error: PickError | null) => void;
 }
 
-export function SquadColumn({ side }: SquadColumnProps) {
+export function SquadColumn({ side, onError }: SquadColumnProps) {
   const homeTeam = useSquadUpStore((state) => state.homeTeam);
   const awayTeam = useSquadUpStore((state) => state.awayTeam);
   const setTeamName = useSquadUpStore((state) => state.setTeamName);
@@ -50,9 +51,7 @@ export function SquadColumn({ side }: SquadColumnProps) {
 
   // null = not editing, show the committed value; a string = live search text.
   const [drafts, setDrafts] = useState<(string | null)[]>(() => new Array(POSITION_SLOTS.length).fill(null));
-  const [slotErrors, setSlotErrors] = useState<(SlotError | null)[]>(() => new Array(POSITION_SLOTS.length).fill(null));
   const [nameDraft, setNameDraft] = useState(team.name);
-  const [nameError, setNameError] = useState(false);
 
   function setDraft(index: number, value: string | null) {
     setDrafts((prev) => {
@@ -62,35 +61,27 @@ export function SquadColumn({ side }: SquadColumnProps) {
     });
   }
 
-  function setSlotError(index: number, error: SlotError | null) {
-    setSlotErrors((prev) => {
-      const next = [...prev];
-      next[index] = error;
-      return next;
-    });
-  }
-
   function handleSelect(index: number, option: PlayerOption) {
     const player = playersById.get(option.id);
     if (!player) return;
     if (isDuplicate(player.name, side, index, homeTeam, awayTeam)) {
-      setSlotError(index, { kind: "duplicate", message: "Already picked" });
+      onError({ variant: "foul", message: "Already picked" });
       return;
     }
     setPlayer(side, index, player);
     setDraft(index, null);
-    setSlotError(index, null);
+    onError(null);
   }
 
   function handleUseUnmatched(index: number, rawText: string) {
     const name = rawText.trim();
     if (!name) return;
     if (containsProfanity(name)) {
-      setSlotError(index, { kind: "profanity", message: "That one's not making the squad" });
+      onError({ variant: "redCard", message: "That one's not making the squad" });
       return;
     }
     if (isDuplicate(name, side, index, homeTeam, awayTeam)) {
-      setSlotError(index, { kind: "duplicate", message: "Already picked" });
+      onError({ variant: "foul", message: "Already picked" });
       return;
     }
     const customPlayer: Player = {
@@ -104,7 +95,7 @@ export function SquadColumn({ side }: SquadColumnProps) {
     };
     setPlayer(side, index, customPlayer);
     setDraft(index, null);
-    setSlotError(index, null);
+    onError(null);
   }
 
   function handleRandomise() {
@@ -131,24 +122,23 @@ export function SquadColumn({ side }: SquadColumnProps) {
     });
 
     setDrafts(new Array(POSITION_SLOTS.length).fill(null));
-    setSlotErrors(new Array(POSITION_SLOTS.length).fill(null));
+    onError(null);
   }
 
   function handleClear() {
     clearTeam(side);
     setDrafts(new Array(POSITION_SLOTS.length).fill(null));
-    setSlotErrors(new Array(POSITION_SLOTS.length).fill(null));
     setNameDraft("");
-    setNameError(false);
+    onError(null);
   }
 
   function handleNameBlur() {
     const trimmed = nameDraft.trim();
     if (containsProfanity(trimmed)) {
-      setNameError(true);
+      onError({ variant: "yellowCard", message: "Keep the team name clean" });
       return;
     }
-    setNameError(false);
+    onError(null);
     setTeamName(side, trimmed);
   }
 
@@ -160,11 +150,10 @@ export function SquadColumn({ side }: SquadColumnProps) {
           value={nameDraft}
           onChange={(event) => {
             setNameDraft(event.target.value);
-            setNameError(false);
+            onError(null);
           }}
           onBlur={handleNameBlur}
         />
-        {nameError && <ErrorChip variant="yellowCard" message="Keep the team name clean" />}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -180,37 +169,26 @@ export function SquadColumn({ side }: SquadColumnProps) {
                   rating: player.overallRating,
                 }))
               : [];
-          const error = slotErrors[index];
 
           return (
-            <div key={index} className="flex flex-col gap-2">
-              <PlayerInput
-                position={position}
-                side={side}
-                value={value}
-                options={options}
-                onValueChange={(text) => {
-                  setDraft(index, text);
-                  setSlotError(index, null);
-                }}
-                onSelect={(option) => handleSelect(index, option)}
-                // Only offer the fallback while actively editing (draft !== null) — once a
-                // commit resets the draft, the field stays focused but should stop treating
-                // the now-committed name as an unmatched query (it has no search options
-                // either way, so without this gate the panel would silently reappear).
-                onUseUnmatched={draft !== null ? (text) => handleUseUnmatched(index, text) : undefined}
-                onBlur={() => {
-                  // Don't clear the error here: the chip is in normal document flow (SPEC.md 6
-                  // — it sits close to its field), so removing it mid-blur would shift every
-                  // sibling below it right as a pending click (e.g. Randomise) lands on it.
-                  // Errors only clear once the user actually corrects the field (onValueChange).
-                  setDraft(index, null);
-                }}
-              />
-              {error && (
-                <ErrorChip variant={error.kind === "duplicate" ? "foul" : "redCard"} message={error.message} />
-              )}
-            </div>
+            <PlayerInput
+              key={index}
+              position={position}
+              side={side}
+              value={value}
+              options={options}
+              onValueChange={(text) => {
+                setDraft(index, text);
+                onError(null);
+              }}
+              onSelect={(option) => handleSelect(index, option)}
+              // Only offer the fallback while actively editing (draft !== null) — once a
+              // commit resets the draft, the field stays focused but should stop treating
+              // the now-committed name as an unmatched query (it has no search options
+              // either way, so without this gate the panel would silently reappear).
+              onUseUnmatched={draft !== null ? (text) => handleUseUnmatched(index, text) : undefined}
+              onBlur={() => setDraft(index, null)}
+            />
           );
         })}
       </div>
