@@ -1,10 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Home from "@/app/page";
 
-describe("Home", () => {
-  it("renders the Squad Up heading", () => {
-    render(<Home />);
-    expect(screen.getByRole("heading", { name: /squad up/i })).toBeInTheDocument();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
+import AgeCheckPage from "@/app/page";
+
+describe("AgeCheckPage", () => {
+  it("renders the Age Check heading", () => {
+    render(<AgeCheckPage />);
+    expect(
+      screen.getByRole("heading", { name: /age check/i }),
+    ).toBeInTheDocument();
   });
 });
