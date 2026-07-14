@@ -296,9 +296,9 @@ export default function DesignSystemPage() {
       </Section>
 
       <Section title="Error chip">
-        <ErrorChip message="🟨 Yellow card, keep the team name clean" />
-        <ErrorChip message="🟥 Red card, that one's not making the squad" />
-        <ErrorChip message="Already picked" />
+        <ErrorChip variant="foul" message="Already picked" />
+        <ErrorChip variant="yellowCard" message="Keep the team name clean" />
+        <ErrorChip variant="redCard" message="That one's not making the squad" />
       </Section>
     </main>
   );
