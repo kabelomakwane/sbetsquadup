@@ -12,17 +12,23 @@
   --color-white-75: rgba(255, 255, 255, 0.75);
   --color-black-60: rgba(0, 0, 0, 0.6);
 
+  /* Disabled-state button fills — Figma node 99:467 */
+  --color-brand-red-disabled: #83110d;
+  --color-brand-yellow-disabled: #91771d;
+  --color-brand-blue-disabled: #0a1362;
+
   --radius-pill: 999px;
   --radius-pill-input: 64px;
 
   /*
-   * SuperSport font files aren't sourced yet (see CLAUDE.md "Known gaps").
-   * These fall back to system font stacks that approximate the intended
-   * weight/style until real font files are added.
+   * SuperSport Extra ships one weight (900) in two cuts: upright and
+   * italic. font-display and font-label both point at it — pair with
+   * Tailwind's italic/not-italic utility for the cut you need.
    */
-  --font-display: "Arial Black", var(--font-inter), sans-serif;
-  --font-button: var(--font-inter), sans-serif;
-  --font-tag: var(--font-inter), sans-serif;
+  --font-display: var(--font-supersport-extra), sans-serif;
+  --font-label: var(--font-supersport-extra), sans-serif;
+  --font-tag: var(--font-supersport-hd), sans-serif;
+  --font-button: var(--font-supersport-sd), sans-serif;
   --font-body: var(--font-inter), sans-serif;
 }
 
@@ -36,13 +42,17 @@
   --color-brand-yellow: var(--color-brand-yellow);
   --color-white-75: var(--color-white-75);
   --color-black-60: var(--color-black-60);
+  --color-brand-red-disabled: var(--color-brand-red-disabled);
+  --color-brand-yellow-disabled: var(--color-brand-yellow-disabled);
+  --color-brand-blue-disabled: var(--color-brand-blue-disabled);
 
   --radius-pill: var(--radius-pill);
   --radius-pill-input: var(--radius-pill-input);
 
   --font-display: var(--font-display);
-  --font-button: var(--font-button);
+  --font-label: var(--font-label);
   --font-tag: var(--font-tag);
+  --font-button: var(--font-button);
   --font-body: var(--font-body);
 }
 
