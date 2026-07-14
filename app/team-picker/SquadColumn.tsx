@@ -153,7 +153,7 @@ export function SquadColumn({ side }: SquadColumnProps) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex h-full w-full flex-col justify-between gap-4">
       <div className="flex flex-col gap-1">
         <TeamInput
           side={side}

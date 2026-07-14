@@ -35,14 +35,23 @@ export default function TeamPickerPage() {
   };
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-10 px-6 py-12">
+    <main className="flex flex-1 flex-col items-center gap-8 px-8 py-12">
       <Heading level={1} className="text-center">
         Select your dream team
       </Heading>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 items-start gap-10 md:grid-cols-[1fr_minmax(280px,1.2fr)_1fr]">
+      {/*
+        Figma 68:487: Home/Field/Away sit in one row at fixed 256px/800px/256px
+        widths (gap-32px), with the side columns stretched to the pitch's full
+        height. The xl: grid below reproduces that exact 256:800:256 ratio
+        (as fr weights, so it scales fluidly instead of overflowing narrower
+        desktop widths) capped at the design's own 1376px total content width.
+        The 256px floor on the side columns is load-bearing, not decorative —
+        it's the minimum "Pick A Team Name" needs before it starts clipping.
+      */}
+      <div className="grid w-full max-w-[1376px] grid-cols-1 gap-8 xl:grid-cols-[minmax(256px,256fr)_minmax(400px,800fr)_minmax(256px,256fr)]">
         <SquadColumn side="home" />
-        <div className="w-full md:pt-6">
+        <div className="flex h-full w-full items-center justify-center">
           <Field home={teamToSlots(homeTeam)} away={teamToSlots(awayTeam)} />
         </div>
         <SquadColumn side="away" />
