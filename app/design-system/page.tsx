@@ -5,6 +5,7 @@ import { TextInput } from "@/components/TextInput";
 import { TeamInput } from "@/components/TeamInput";
 import { PlayerInput, type PlayerOption } from "@/components/PlayerInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
+import { CommentaryEventRow } from "@/components/CommentaryEventRow";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
 import { TabGroup } from "@/components/TabGroup";
@@ -254,6 +255,28 @@ export default function DesignSystemPage() {
         {timerStates.map((state) => (
           <Timer key={state} state={state} time="12:34" />
         ))}
+      </Section>
+
+      <Section title="Commentary event row">
+        <div className="flex w-full max-w-xl flex-col gap-4">
+          <CommentaryEventRow variant="default" minute={12} text="Insert game commentary here." />
+          <CommentaryEventRow
+            variant="keyMoment"
+            minute={21}
+            side="home"
+            headline="Key Moment"
+            text="Insert game commentary here."
+          />
+          <CommentaryEventRow
+            variant="keyMoment"
+            minute={34}
+            side="away"
+            headline="Key Moment"
+            text="Insert game commentary here."
+          />
+          <CommentaryEventRow variant="halfTime" />
+          <CommentaryEventRow variant="default" minute={46} text="Insert game commentary here." />
+        </div>
       </Section>
 
       <Section title="Tab group">
