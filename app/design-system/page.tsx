@@ -5,6 +5,7 @@ import { TextInput } from "@/components/TextInput";
 import { TeamInput } from "@/components/TeamInput";
 import { PlayerInput, type PlayerOption } from "@/components/PlayerInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
+import { Field } from "@/components/Field";
 import { CommentaryEventRow } from "@/components/CommentaryEventRow";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
@@ -233,6 +234,33 @@ export default function DesignSystemPage() {
         <PlayerBubble state="filled" side="home" initials="VvD" playerName="V. van Dijk" />
         <PlayerBubble state="filled" side="away" initials="N" playerName="Neymar" />
         <PlayerBubble state="filled" side="away" initials="LY" playerName="L. Yashin" />
+      </Section>
+
+      <Section title="Field — empty">
+        <div className="w-full max-w-3xl">
+          <Field />
+        </div>
+      </Section>
+
+      <Section title="Field — filled">
+        <div className="w-full max-w-3xl">
+          <Field
+            home={{
+              gk: { initials: "MN", playerName: "M. Neuer" },
+              def: { initials: "VvD", playerName: "V. van Dijk" },
+              mid1: { initials: "AI", playerName: "A. Iniesta" },
+              mid2: { initials: "TH", playerName: "T. Henry" },
+              st: { initials: "EH", playerName: "E. Haaland" },
+            }}
+            away={{
+              st: { initials: "N", playerName: "Neymar" },
+              mid1: { initials: "RvP", playerName: "R. van Persie" },
+              mid2: { initials: "WR", playerName: "W. Rooney" },
+              def: { initials: "SR", playerName: "S. Ramos" },
+              gk: { initials: "LY", playerName: "L. Yashin" },
+            }}
+          />
+        </div>
       </Section>
 
       <Section title="Score bug">
