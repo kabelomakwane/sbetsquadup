@@ -10,7 +10,7 @@ import { getSession } from "@/lib/auth";
 import { getPlayerInitials, getShortPlayerName } from "@/lib/data/players";
 import { POSITION_SLOTS, type Team } from "@/lib/types";
 import { useSquadUpStore } from "@/store/useSquadUpStore";
-import { SquadColumn, type PickError } from "./SquadColumn";
+import { SquadColumn, playerInputId, type PickError } from "./SquadColumn";
 
 // index 0..4 of POSITION_SLOTS (ST, MID, MID, DEF, GK) maps onto Field's named slots.
 function teamToSlots(team: Team): TeamSlots {
@@ -31,7 +31,10 @@ export default function TeamPickerPage() {
   const [pickError, setPickError] = useState<PickError | null>(null);
 
   const isComplete =
-    homeTeam.players.every(Boolean) && awayTeam.players.every(Boolean);
+    homeTeam.players.every(Boolean) &&
+    awayTeam.players.every(Boolean) &&
+    homeTeam.name.trim() !== "" &&
+    awayTeam.name.trim() !== "";
 
   const handleKickOff = () => {
     router.push(getSession() ? "/loading" : "/sign-in");
@@ -55,7 +58,11 @@ export default function TeamPickerPage() {
       <div className="grid w-full max-w-[1376px] grid-cols-1 gap-8 xl:grid-cols-[minmax(256px,256fr)_minmax(400px,800fr)_minmax(256px,256fr)]">
         <SquadColumn side="home" onError={setPickError} />
         <div className="flex h-full w-full items-center justify-center">
-          <Field home={teamToSlots(homeTeam)} away={teamToSlots(awayTeam)} />
+          <Field
+            home={teamToSlots(homeTeam)}
+            away={teamToSlots(awayTeam)}
+            onSlotClick={(side, index) => document.getElementById(playerInputId(side, index))?.focus()}
+          />
         </div>
         <SquadColumn side="away" onError={setPickError} />
       </div>

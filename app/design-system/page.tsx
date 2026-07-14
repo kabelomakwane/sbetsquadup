@@ -28,11 +28,11 @@ const buttonVariants = [
   { size: "small", disabled: true },
 ] as const;
 const samplePlayerOptions: PlayerOption[] = [
-  { id: "1", name: "Erling Haaland", rating: 93 },
-  { id: "2", name: "Thierry Henry", rating: 91 },
-  { id: "3", name: "Lionel Messi", rating: 99 },
-  { id: "4", name: "Cristiano Ronaldo", rating: 98 },
-  { id: "5", name: "Ivan Toney", rating: 78 },
+  { id: "1", name: "Erling Haaland", rating: 93, positions: ["ST"] },
+  { id: "2", name: "Thierry Henry", rating: 91, positions: ["ST", "MID"] },
+  { id: "3", name: "Lionel Messi", rating: 99, positions: ["ST", "MID"] },
+  { id: "4", name: "Cristiano Ronaldo", rating: 98, positions: ["ST", "MID"] },
+  { id: "5", name: "Ivan Toney", rating: 78, positions: ["ST"] },
 ];
 
 function DemoIcon() {

@@ -9,10 +9,16 @@ import { useSquadUpStore } from "@/store/useSquadUpStore";
 import { POSITION_SLOTS, type Player, type Side, type Team } from "@/lib/types";
 import { STUB_PLAYERS, normalizePlayerName, playersById, searchPlayers } from "@/lib/data/players";
 import { containsProfanity } from "@/lib/data/profanity";
+import { randomTeamName } from "@/lib/data/teamNames";
 
 export interface PickError {
   variant: ErrorChipVariant;
   message: string;
+}
+
+/** DOM id for a slot's PlayerInput — shared between the id-setter here and the bubble-click-to-focus wiring in page.tsx. */
+export function playerInputId(side: Side, index: number): string {
+  return `player-input-${side}-${index}`;
 }
 
 // Duplicate check is global across both squads (SPEC.md 5.4) and keyed by
@@ -51,6 +57,11 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
 
   // null = not editing, show the committed value; a string = live search text.
   const [drafts, setDrafts] = useState<(string | null)[]>(() => new Array(POSITION_SLOTS.length).fill(null));
+  // Tracks which slot is currently focused, independent of `drafts` — needed so the
+  // dropdown can show a browse list immediately on focus without touching the
+  // displayed value (draft = "" on focus would blank an already-filled slot, since
+  // "" ?? x evaluates to "" in JS, not a fallback to x).
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [nameDraft, setNameDraft] = useState(team.name);
 
   function setDraft(index: number, value: string | null) {
@@ -70,6 +81,7 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
     }
     setPlayer(side, index, player);
     setDraft(index, null);
+    setFocusedIndex(null);
     onError(null);
   }
 
@@ -95,6 +107,7 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
     };
     setPlayer(side, index, customPlayer);
     setDraft(index, null);
+    setFocusedIndex(null);
     onError(null);
   }
 
@@ -121,22 +134,29 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
       setPlayer(side, index, pick);
     });
 
+    const name = randomTeamName();
+    setTeamName(side, name);
+    setNameDraft(name);
+
     setDrafts(new Array(POSITION_SLOTS.length).fill(null));
+    setFocusedIndex(null);
     onError(null);
   }
 
   function handleClear() {
     clearTeam(side);
     setDrafts(new Array(POSITION_SLOTS.length).fill(null));
+    setFocusedIndex(null);
     setNameDraft("");
     onError(null);
   }
 
-  function handleNameBlur() {
-    const trimmed = nameDraft.trim();
+  function handleNameChange(text: string) {
+    setNameDraft(text);
+    const trimmed = text.trim();
     if (containsProfanity(trimmed)) {
       onError({ variant: "yellowCard", message: "Keep the team name clean" });
-      return;
+      return; // never let a profane draft reach the store
     }
     onError(null);
     setTeamName(side, trimmed);
@@ -145,15 +165,7 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
   return (
     <div className="flex h-full w-full flex-col justify-between gap-4">
       <div className="flex flex-col gap-1">
-        <TeamInput
-          side={side}
-          value={nameDraft}
-          onChange={(event) => {
-            setNameDraft(event.target.value);
-            onError(null);
-          }}
-          onBlur={handleNameBlur}
-        />
+        <TeamInput side={side} value={nameDraft} onChange={(event) => handleNameChange(event.target.value)} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -161,22 +173,20 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
           const committed = team.players[index];
           const draft = drafts[index];
           const value = draft ?? committed?.name ?? "";
-          const options =
-            draft !== null
-              ? searchPlayers(draft, position).map((player) => ({
-                  id: player.id,
-                  // Never blocked by position (SPEC.md 5.4), but an out-of-position
-                  // pick like this should look intentional, not arbitrary — so a
-                  // non-fit candidate gets its natural position appended right in
-                  // the row text, e.g. "Cristiano Ronaldo (ST)" under a MID slot.
-                  name: player.positions.includes(position) ? player.name : `${player.name} (${player.positions[0]})`,
-                  rating: player.overallRating,
-                }))
-              : [];
+          const browsing = draft !== null || focusedIndex === index;
+          const options = browsing
+            ? searchPlayers(draft ?? "", position).map((player) => ({
+                id: player.id,
+                name: player.name,
+                rating: player.overallRating,
+                positions: player.positions,
+              }))
+            : [];
 
           return (
             <PlayerInput
               key={index}
+              id={playerInputId(side, index)}
               position={position}
               side={side}
               value={value}
@@ -191,7 +201,11 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
               // the now-committed name as an unmatched query (it has no search options
               // either way, so without this gate the panel would silently reappear).
               onUseUnmatched={draft !== null ? (text) => handleUseUnmatched(index, text) : undefined}
-              onBlur={() => setDraft(index, null)}
+              onFocus={() => setFocusedIndex(index)}
+              onBlur={() => {
+                setDraft(index, null);
+                setFocusedIndex((current) => (current === index ? null : current));
+              }}
             />
           );
         })}

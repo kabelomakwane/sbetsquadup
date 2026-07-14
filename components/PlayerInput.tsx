@@ -7,6 +7,8 @@ export interface PlayerOption {
   id: string;
   name: string;
   rating: number;
+  /** Natural positions — always shown as a subtitle (Figma 105:791), not just for non-fits. */
+  positions: Position[];
 }
 
 interface PlayerInputProps
@@ -68,14 +70,14 @@ export function PlayerInput({
             onBlur?.(event);
           }}
           onChange={(event) => onValueChange?.(event.target.value)}
-          className={`font-body min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
+          className={`font-button min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
             filled ? "text-brand-blue" : "text-black-60"
           }`}
           {...props}
         />
       </div>
       {isOpen && (
-        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1 shadow-lg">
+        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex max-h-72 w-full flex-col divide-y divide-black/15 overflow-x-hidden overflow-y-auto rounded-3xl bg-white py-1 shadow-lg">
           {options.map((option) => (
             <li key={option.id}>
               <button
@@ -84,11 +86,12 @@ export function PlayerInput({
                 onClick={() => onSelect?.(option)}
                 className="flex w-full items-center hover:bg-black-60/10"
               >
-                <span className="font-label flex w-[52px] shrink-0 items-center justify-center px-3 py-2 text-base font-black not-italic text-brand-blue">
+                <span className="font-label flex w-[30px] shrink-0 items-center justify-center px-3 py-2 text-base font-black not-italic text-brand-blue">
                   {option.rating}
                 </span>
-                <span className="font-body flex-1 px-3 py-2 text-left text-base font-normal not-italic text-black">
-                  {option.name}
+                <span className="flex flex-1 flex-col items-start px-3 py-2 text-left">
+                  <span className="font-button text-base font-normal not-italic text-black">{option.name}</span>
+                  <span className="text-[8px] text-black/50">{option.positions.join(" • ")}</span>
                 </span>
               </button>
             </li>
