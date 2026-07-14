@@ -87,7 +87,7 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
     const customPlayer: Player = {
       id: crypto.randomUUID(),
       name,
-      position: POSITION_SLOTS[index],
+      positions: [POSITION_SLOTS[index]],
       club: "Free Agent",
       overallRating: 65,
       era: "current",
@@ -111,7 +111,7 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
       // MID slots from ever landing on the same player within one Randomise.
       const candidates = STUB_PLAYERS.filter(
         (player) =>
-          player.position === position &&
+          player.positions.includes(position) &&
           !excludedNames.has(normalizePlayerName(player.name)) &&
           !chosenNames.has(normalizePlayerName(player.name)),
       );
@@ -165,7 +165,11 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
             draft !== null
               ? searchPlayers(draft, position).map((player) => ({
                   id: player.id,
-                  name: player.name,
+                  // Never blocked by position (SPEC.md 5.4), but an out-of-position
+                  // pick like this should look intentional, not arbitrary — so a
+                  // non-fit candidate gets its natural position appended right in
+                  // the row text, e.g. "Cristiano Ronaldo (ST)" under a MID slot.
+                  name: player.positions.includes(position) ? player.name : `${player.name} (${player.positions[0]})`,
                   rating: player.overallRating,
                 }))
               : [];

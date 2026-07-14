@@ -8,7 +8,10 @@ export type PlayerSource = "database" | "custom";
 export interface Player {
   id: string;
   name: string;
-  position: Position;
+  // Ordered, first entry is the primary/natural position. A slot elsewhere
+  // (Team Picker) not in this list is still selectable, just "out of
+  // position" — see SPEC.md 8.1 for the match-simulation rating penalty.
+  positions: Position[];
   club: string;
   overallRating: number;
   era: Era;
