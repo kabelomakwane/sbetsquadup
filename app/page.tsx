@@ -1,16 +1,40 @@
-export default function Home() {
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import ScreenStub from "@/components/ScreenStub";
+import { StubButton } from "@/components/StubLink";
+import { useSquadUpStore } from "@/store/useSquadUpStore";
+
+// SPEC.md 5.1 Age Check — flow step 1.
+export default function AgeCheckPage() {
+  const router = useRouter();
+  const ageConfirmed = useSquadUpStore((state) => state.ageConfirmed);
+  const confirmAge = useSquadUpStore((state) => state.confirmAge);
+
+  useEffect(() => {
+    if (ageConfirmed) {
+      router.replace("/landing");
+    }
+  }, [ageConfirmed, router]);
+
   return (
-    <main
-      className="flex flex-1 flex-col items-center justify-center gap-4"
-      style={{
-        background:
-          "linear-gradient(180deg, var(--color-brand-blue), var(--color-brand-blue-end))",
-      }}
-    >
-      <h1 className="font-display text-3xl uppercase italic text-white">
-        Squad Up
-      </h1>
-      <p className="font-body text-white-75">Coming soon.</p>
-    </main>
+    <ScreenStub name="Age Check">
+      <StubButton
+        onClick={() => {
+          confirmAge();
+          router.push("/landing");
+        }}
+      >
+        I&apos;m 18 or over
+      </StubButton>
+      <a
+        className="font-button text-sm text-white-75 underline"
+        href="https://supersport.com"
+        rel="noopener noreferrer"
+      >
+        I&apos;m not 18
+      </a>
+    </ScreenStub>
   );
 }
