@@ -9,7 +9,7 @@ import { CommentaryEventRow } from "@/components/CommentaryEventRow";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
 import { TabPicker } from "@/components/TabPicker";
-import { StatValuePill } from "@/components/StatValuePill";
+import { StatLine } from "@/components/StatLine";
 import { ErrorChip } from "@/components/ErrorChip";
 import type { Position } from "@/components/types";
 
@@ -287,20 +287,11 @@ export default function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Stat value pill">
-        <div className="flex items-center gap-3">
-          <StatValuePill value="14" side="home" />
-          <Text as="span" size="small" muted>
-            Shots
-          </Text>
-          <StatValuePill value="9" side="away" />
-        </div>
-        <div className="flex items-center gap-3">
-          <StatValuePill value="58%" side="home" />
-          <Text as="span" size="small" muted>
-            Possession
-          </Text>
-          <StatValuePill value="42%" side="none" />
+      <Section title="Stat line">
+        <div className="flex w-full max-w-md flex-col gap-3">
+          <StatLine stat="Shots" homeValue={0} awayValue={0} />
+          <StatLine stat="Shots On Target" homeValue={5} awayValue={4} leading="home" />
+          <StatLine stat="Possession" homeValue={4} awayValue={5} leading="away" />
         </div>
       </Section>
 
