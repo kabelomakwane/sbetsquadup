@@ -11,7 +11,7 @@ describe("AgeCheckPage", () => {
   it("renders the Age Check heading", () => {
     render(<AgeCheckPage />);
     expect(
-      screen.getByRole("heading", { name: /age check/i }),
+      screen.getByRole("heading", { name: /confirm you are over 18/i }),
     ).toBeInTheDocument();
   });
 });
