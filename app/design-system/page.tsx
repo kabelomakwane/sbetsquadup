@@ -1,7 +1,9 @@
 import { Heading } from "@/components/Heading";
 import { Text } from "@/components/Text";
 import { PillButton } from "@/components/PillButton";
-import { PillInput, type PillInputOption } from "@/components/PillInput";
+import { TextInput } from "@/components/TextInput";
+import { TeamInput } from "@/components/TeamInput";
+import { PlayerInput, type PlayerOption } from "@/components/PlayerInput";
 import { PlayerBubble } from "@/components/PlayerBubble";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
@@ -23,10 +25,12 @@ const buttonVariants = [
   { size: "small", disabled: false },
   { size: "small", disabled: true },
 ] as const;
-const samplePlayerOptions: PillInputOption[] = [
-  { id: "1", label: "Erling Haaland" },
-  { id: "2", label: "Kylian Mbappé" },
-  { id: "3", label: "Bukayo Saka" },
+const samplePlayerOptions: PlayerOption[] = [
+  { id: "1", name: "Erling Haaland", rating: 93 },
+  { id: "2", name: "Thierry Henry", rating: 91 },
+  { id: "3", name: "Lionel Messi", rating: 99 },
+  { id: "4", name: "Cristiano Ronaldo", rating: 98 },
+  { id: "5", name: "Ivan Toney", rating: 78 },
 ];
 
 function DemoIcon() {
@@ -135,10 +139,29 @@ export default function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Pill input — empty state">
+      <Section title="Text input">
+        <div className="flex w-full max-w-sm flex-col gap-3">
+          <TextInput placeholder="Placeholder" readOnly />
+          <TextInput value="Filled value" readOnly />
+          <TextInput placeholder="Placeholder" leftIcon={<DemoIcon />} rightIcon={<DemoIcon />} readOnly />
+        </div>
+      </Section>
+
+      <Section title="Team input">
+        <div className="flex w-full max-w-xs flex-col gap-3 rounded-2xl bg-brand-blue p-6">
+          <TeamInput side="home" value="" readOnly />
+          <TeamInput side="home" value="Ballerz FC" readOnly />
+        </div>
+        <div className="flex w-full max-w-xs flex-col gap-3 rounded-2xl bg-brand-blue p-6">
+          <TeamInput side="away" value="" readOnly />
+          <TeamInput side="away" value="One Touch United" readOnly />
+        </div>
+      </Section>
+
+      <Section title="Player input — empty state">
         <div className="flex w-full max-w-sm flex-col gap-3">
           {positions.map((position) => (
-            <PillInput
+            <PlayerInput
               key={`empty-home-${position}`}
               position={position}
               side="home"
@@ -149,7 +172,7 @@ export default function DesignSystemPage() {
         </div>
         <div className="flex w-full max-w-sm flex-col gap-3">
           {positions.map((position) => (
-            <PillInput
+            <PlayerInput
               key={`empty-away-${position}`}
               position={position}
               side="away"
@@ -160,24 +183,24 @@ export default function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Pill input — filled state">
+      <Section title="Player input — filled state">
         <div className="flex w-full max-w-sm flex-col gap-3">
-          <PillInput position="ST" side="home" value="Erling Haaland" readOnly />
-          <PillInput position="MID" side="home" value="Thierry Henry" readOnly />
-          <PillInput position="DEF" side="home" value="Virgil van Dijk" readOnly />
-          <PillInput position="GK" side="home" value="Manuel Neuer" readOnly />
+          <PlayerInput position="ST" side="home" value="Erling Haaland" readOnly />
+          <PlayerInput position="MID" side="home" value="Thierry Henry" readOnly />
+          <PlayerInput position="DEF" side="home" value="Virgil van Dijk" readOnly />
+          <PlayerInput position="GK" side="home" value="Manuel Neuer" readOnly />
         </div>
         <div className="flex w-full max-w-sm flex-col gap-3">
-          <PillInput position="ST" side="away" value="Neymar" readOnly />
-          <PillInput position="MID" side="away" value="Wayne Rooney" readOnly />
-          <PillInput position="DEF" side="away" value="Sergio Ramos" readOnly />
-          <PillInput position="GK" side="away" value="Lev Yashin" readOnly />
+          <PlayerInput position="ST" side="away" value="Neymar" readOnly />
+          <PlayerInput position="MID" side="away" value="Wayne Rooney" readOnly />
+          <PlayerInput position="DEF" side="away" value="Sergio Ramos" readOnly />
+          <PlayerInput position="GK" side="away" value="Lev Yashin" readOnly />
         </div>
       </Section>
 
-      <Section title="Pill input — active state (dropdown)">
-        <div className="flex w-full max-w-sm flex-col gap-3 pb-48">
-          <PillInput
+      <Section title="Player input — active state (dropdown)">
+        <div className="flex w-full max-w-sm flex-col gap-3 pb-64">
+          <PlayerInput
             position="ST"
             side="home"
             value=""
@@ -186,8 +209,8 @@ export default function DesignSystemPage() {
             readOnly
           />
         </div>
-        <div className="flex w-full max-w-sm flex-col gap-3 pb-48">
-          <PillInput
+        <div className="flex w-full max-w-sm flex-col gap-3 pb-64">
+          <PlayerInput
             position="ST"
             side="away"
             value=""

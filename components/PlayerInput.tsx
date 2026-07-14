@@ -3,20 +3,21 @@
 import { useState, type InputHTMLAttributes } from "react";
 import type { Position, Side } from "./types";
 
-export interface PillInputOption {
+export interface PlayerOption {
   id: string;
-  label: string;
+  name: string;
+  rating: number;
 }
 
-interface PillInputProps
+interface PlayerInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "value" | "onChange" | "onSelect"> {
   position: Position;
   side: Side;
   value: string;
-  options?: PillInputOption[];
+  options?: PlayerOption[];
   active?: boolean;
   onValueChange?: (value: string) => void;
-  onSelect?: (option: PillInputOption) => void;
+  onSelect?: (option: PlayerOption) => void;
 }
 
 const tagColor: Record<Side, string> = {
@@ -24,16 +25,11 @@ const tagColor: Record<Side, string> = {
   away: "text-brand-yellow",
 };
 
-const activeBorderColor: Record<Side, string> = {
-  home: "border-brand-red",
-  away: "border-brand-yellow",
-};
-
-export function PillInput({
+export function PlayerInput({
   position,
   side,
   value,
-  placeholder = "Select Player",
+  placeholder = "Select a player",
   options = [],
   active,
   onValueChange,
@@ -42,22 +38,16 @@ export function PillInput({
   onFocus,
   onBlur,
   ...props
-}: PillInputProps) {
+}: PlayerInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const filled = value.length > 0;
   const isOpen = (active ?? isFocused) && options.length > 0;
 
   return (
-    <div className={`relative w-full ${className}`}>
-      <div
-        className={`flex h-12 w-full items-center border bg-white ${
-          isOpen
-            ? `rounded-t-[64px] rounded-b-none ${activeBorderColor[side]}`
-            : "rounded-pill-input border-white"
-        }`}
-      >
+    <div className={`flex w-full flex-col gap-2 ${className}`}>
+      <div className="flex h-12 w-full items-center rounded-pill bg-white">
         <span
-          className={`font-tag flex w-[52px] shrink-0 items-center justify-center text-base font-bold not-italic ${tagColor[side]}`}
+          className={`font-label flex w-[52px] shrink-0 items-center justify-center px-3 text-base font-black not-italic ${tagColor[side]}`}
         >
           {position}
         </span>
@@ -73,25 +63,28 @@ export function PillInput({
             onBlur?.(event);
           }}
           onChange={(event) => onValueChange?.(event.target.value)}
-          className={`font-button min-w-0 flex-1 bg-transparent px-3 text-base not-italic outline-none placeholder:text-black-60 ${
-            filled ? "text-brand-blue" : "text-black-60"
+          className={`font-body min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
+            filled ? "text-black" : "text-black-60"
           }`}
           {...props}
         />
       </div>
       {isOpen && (
-        <ul
-          className={`absolute inset-x-0 top-full z-10 max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 bg-white py-2 shadow-lg ${activeBorderColor[side]}`}
-        >
+        <ul className="flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1">
           {options.map((option) => (
             <li key={option.id}>
               <button
                 type="button"
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => onSelect?.(option)}
-                className="font-button block w-full px-4 py-2 text-left text-base not-italic text-brand-blue hover:bg-black-60/10"
+                className="flex w-full items-center hover:bg-black-60/10"
               >
-                {option.label}
+                <span className="font-label flex w-[52px] shrink-0 items-center justify-center px-3 py-2 text-base font-black not-italic text-brand-blue">
+                  {option.rating}
+                </span>
+                <span className="font-body flex-1 px-3 py-2 text-left text-base font-normal not-italic text-black">
+                  {option.name}
+                </span>
               </button>
             </li>
           ))}
