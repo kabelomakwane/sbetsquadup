@@ -18,6 +18,8 @@ interface PlayerInputProps
   active?: boolean;
   onValueChange?: (value: string) => void;
   onSelect?: (option: PlayerOption) => void;
+  /** Search came back empty — offers a "Use '{value}' anyway" row (SPEC.md 5.4/7 unmatched fallback). */
+  onUseUnmatched?: (value: string) => void;
 }
 
 const tagColor: Record<Side, string> = {
@@ -34,6 +36,7 @@ export function PlayerInput({
   active,
   onValueChange,
   onSelect,
+  onUseUnmatched,
   className = "",
   onFocus,
   onBlur,
@@ -41,7 +44,9 @@ export function PlayerInput({
 }: PlayerInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const filled = value.length > 0;
-  const isOpen = (active ?? isFocused) && options.length > 0;
+  const focused = active ?? isFocused;
+  const isOpen = focused && options.length > 0;
+  const showUnmatched = focused && options.length === 0 && value.trim().length > 0 && Boolean(onUseUnmatched);
 
   return (
     <div className={`flex w-full flex-col gap-2 ${className}`}>
@@ -64,7 +69,7 @@ export function PlayerInput({
           }}
           onChange={(event) => onValueChange?.(event.target.value)}
           className={`font-body min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
-            filled ? "text-black" : "text-black-60"
+            filled ? "text-brand-blue" : "text-black-60"
           }`}
           {...props}
         />
@@ -88,6 +93,22 @@ export function PlayerInput({
               </button>
             </li>
           ))}
+        </ul>
+      )}
+      {showUnmatched && (
+        <ul className="flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1">
+          <li>
+            <button
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => onUseUnmatched?.(value)}
+              className="flex w-full items-center px-3 py-2 hover:bg-black-60/10"
+            >
+              <span className="font-body text-left text-base font-normal not-italic text-black">
+                Use &ldquo;{value}&rdquo; anyway
+              </span>
+            </button>
+          </li>
         </ul>
       )}
     </div>

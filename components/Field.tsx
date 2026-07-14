@@ -2,12 +2,12 @@ import Image from "next/image";
 import { PlayerBubble } from "./PlayerBubble";
 import type { Position, Side } from "./types";
 
-interface PlayerSlot {
+export interface PlayerSlot {
   initials: string;
   playerName: string;
 }
 
-interface TeamSlots {
+export interface TeamSlots {
   st?: PlayerSlot;
   mid1?: PlayerSlot;
   mid2?: PlayerSlot;
