@@ -8,7 +8,7 @@ import { PlayerBubble } from "@/components/PlayerBubble";
 import { CommentaryEventRow } from "@/components/CommentaryEventRow";
 import { ScoreBug } from "@/components/ScoreBug";
 import { Timer, type TimerState } from "@/components/Timer";
-import { TabGroup } from "@/components/TabGroup";
+import { TabPicker } from "@/components/TabPicker";
 import { StatValuePill } from "@/components/StatValuePill";
 import { ErrorChip } from "@/components/ErrorChip";
 import type { Position } from "@/components/types";
@@ -279,8 +279,12 @@ export default function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Tab group">
-        <TabGroup tabs={["Stats", "Lineups", "Timeline"]} />
+      <Section title="Tab picker">
+        <div className="flex w-full flex-col items-start gap-3">
+          <TabPicker tabs={["Stats", "Lineups", "Timeline"]} defaultTab="Stats" />
+          <TabPicker tabs={["Stats", "Lineups", "Timeline"]} defaultTab="Lineups" />
+          <TabPicker tabs={["Stats", "Lineups", "Timeline"]} defaultTab="Timeline" />
+        </div>
       </Section>
 
       <Section title="Stat value pill">

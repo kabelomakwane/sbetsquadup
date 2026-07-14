@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 
-interface TabGroupProps {
+interface TabPickerProps {
   tabs: string[];
   defaultTab?: string;
   onChange?: (tab: string) => void;
 }
 
-export function TabGroup({ tabs, defaultTab, onChange }: TabGroupProps) {
+export function TabPicker({ tabs, defaultTab, onChange }: TabPickerProps) {
   const [active, setActive] = useState(defaultTab ?? tabs[0]);
 
   function select(tab: string) {
@@ -17,13 +17,13 @@ export function TabGroup({ tabs, defaultTab, onChange }: TabGroupProps) {
   }
 
   return (
-    <div className="inline-flex rounded-pill bg-white/10 p-1">
+    <div className="inline-flex items-start rounded-3xl bg-brand-blue p-1">
       {tabs.map((tab) => (
         <button
           key={tab}
           type="button"
           onClick={() => select(tab)}
-          className={`font-button rounded-pill px-5 py-2 text-sm uppercase italic transition-colors ${
+          className={`font-display flex items-center justify-center whitespace-nowrap rounded-[20px] px-6 py-2 text-base font-black italic transition-colors ${
             active === tab ? "bg-white text-brand-blue" : "text-white"
           }`}
         >
