@@ -1,17 +1,23 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type {
-  Match,
-  MatchHistory,
-  Player,
-  SavedSquad,
-  Side,
-  Team,
-  User,
+import {
+  POSITION_SLOTS,
+  type Match,
+  type MatchHistory,
+  type Player,
+  type SavedSquad,
+  type Side,
+  type Team,
+  type User,
 } from "@/lib/types";
 
 function emptyTeam(side: Side): Team {
-  return { id: crypto.randomUUID(), side, name: "", players: [] };
+  return {
+    id: crypto.randomUUID(),
+    side,
+    name: "",
+    players: new Array(POSITION_SLOTS.length).fill(undefined),
+  };
 }
 
 interface SquadUpState {

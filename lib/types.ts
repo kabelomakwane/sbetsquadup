@@ -20,11 +20,15 @@ export interface LineupEntry {
   goals: number;
 }
 
+// Fixed slot order for the 5 position-tagged rows on the Team Picker — SPEC.md 5.4.
+export const POSITION_SLOTS: readonly Position[] = ["ST", "MID", "MID", "DEF", "GK"];
+
 export interface Team {
   id: string;
   side: Side;
   name: string;
-  players: Player[];
+  // Sparse, fixed-length (POSITION_SLOTS.length) — index i holds the pick for POSITION_SLOTS[i].
+  players: (Player | undefined)[];
 }
 
 export type CommentaryEventType = "goal" | "chance" | "card" | "commentary";
