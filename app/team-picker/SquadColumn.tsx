@@ -112,14 +112,27 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
   }
 
   function handleRandomise() {
+    // Fully-populated side -> regenerate everything (a "give me a fresh one" reset).
+    // Otherwise -> only fill the still-empty fields, leaving deliberate picks alone.
+    const fullyPopulated = team.players.every(Boolean) && team.name.trim() !== "";
+
     const excludedNames = new Set(
       otherTeam.players
         .filter((player): player is Player => Boolean(player))
         .map((player) => normalizePlayerName(player.name)),
     );
+    if (!fullyPopulated) {
+      // Topping up: this side's own already-filled slots are staying put, so a
+      // newly-picked player for an empty slot must not collide with them either.
+      team.players.forEach((player) => {
+        if (player) excludedNames.add(normalizePlayerName(player.name));
+      });
+    }
     const chosenNames = new Set<string>();
 
     POSITION_SLOTS.forEach((position, index) => {
+      if (!fullyPopulated && team.players[index]) return; // leave a populated slot untouched
+
       // Sampling without replacement (via chosenNames) is what stops the two
       // MID slots from ever landing on the same player within one Randomise.
       const candidates = STUB_PLAYERS.filter(
@@ -134,9 +147,11 @@ export function SquadColumn({ side, onError }: SquadColumnProps) {
       setPlayer(side, index, pick);
     });
 
-    const name = randomTeamName();
-    setTeamName(side, name);
-    setNameDraft(name);
+    if (fullyPopulated || team.name.trim() === "") {
+      const name = randomTeamName();
+      setTeamName(side, name);
+      setNameDraft(name);
+    }
 
     setDrafts(new Array(POSITION_SLOTS.length).fill(null));
     setFocusedIndex(null);
