@@ -127,7 +127,7 @@ This is the most complex screen and the core of the product.
 
 - **Layout:** logo, H1, two buttons ('Share Results' / 'Rematch'), Score Bug, and a tabbed panel below with three tabs: **Stats**, **Lineups**, **Timeline**.
   - Stats tab (the one built out in Figma): a row of paired stat comparisons (label center, home value left, away value right) for four stats.
-  - Lineups and Timeline tabs exist as tab targets but their content isn't detailed in the file yet, likely: Lineups shows each side's 5 picked players, Timeline shows the commentary feed condensed to key events with minute markers.
+  - Lineups and Timeline tabs exist as tab targets but their content isn't detailed in the file yet, implemented as: Lineups shows each side's 5 picked players, Timeline shows the full match commentary feed (same `CommentaryEvent[]` the Live Commentary Page plays back, minute-sorted, single-line and two-line highlight rows both included) rather than a condensed subset.
 - **Interactions:** 'Share Results' → Share Sheet. 'Rematch' → Team Picker (squads reset).
 
 ### 5.10 Share Image (`73:1629`) — the shareable result card

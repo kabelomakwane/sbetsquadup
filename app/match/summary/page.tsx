@@ -11,7 +11,7 @@ import { ScoreBug } from "@/components/ScoreBug";
 import { ShareSheetModal } from "@/components/ShareSheetModal";
 import { StatLine } from "@/components/StatLine";
 import { TabPicker } from "@/components/TabPicker";
-import { HALF_MINUTES, MATCH_MINUTES, matchStatRows, playerGoalCounts, teamLineupRows } from "@/lib/simulation";
+import { matchStatRows, playerGoalCounts, teamLineupRows } from "@/lib/simulation";
 import { useSquadUpStore } from "@/store/useSquadUpStore";
 
 const TABS = ["Stats", "Lineups", "Timeline"] as const;
@@ -34,17 +34,9 @@ export default function MatchSummaryPage() {
   const awayRows = useMemo(() => (match ? teamLineupRows(match.awayTeam, goalCounts) : []), [match, goalCounts]);
   const stats = useMemo(() => (match ? matchStatRows(match) : []), [match]);
 
-  // Timeline: the commentary feed condensed to key events (the four
-  // guaranteed fixed-point beats, plus every "highlight" moment that carries
-  // a headline — goals, saves, posts, last-ditch plays, SPEC.md 8.1 step 6),
-  // in chronological order with minute markers.
-  const timelineEvents = useMemo(() => {
-    if (!match) return [];
-    const fixedMinutes: number[] = [1, HALF_MINUTES, HALF_MINUTES + 1, MATCH_MINUTES];
-    return match.events
-      .filter((event) => event.headline || fixedMinutes.includes(event.minute))
-      .sort((a, b) => a.minute - b.minute);
-  }, [match]);
+  // Timeline: the full match commentary feed, in chronological order with
+  // minute markers — match.events is already minute-sorted by simulateMatch.
+  const timelineEvents = useMemo(() => (match ? match.events : []), [match]);
 
   const handleRematch = () => {
     rematch();
