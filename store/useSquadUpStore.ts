@@ -37,6 +37,12 @@ interface SquadUpState {
   match: Match | null;
   setMatch: (match: Match | null) => void;
 
+  // Live Commentary playback (SPEC.md 5.7/9): true once the paced reveal has
+  // started for the current match, so a mid-match exit (or a finished match)
+  // sends any re-entry straight to the result instead of replaying the feed.
+  matchPlaybackStarted: boolean;
+  markMatchPlaybackStarted: () => void;
+
   // Auth — SPEC.md 9, mocked.
   user: User | null;
   isSignedIn: () => boolean;
@@ -82,7 +88,10 @@ export const useSquadUpStore = create<SquadUpState>()(
         set({ homeTeam: emptyTeam("home"), awayTeam: emptyTeam("away") }),
 
       match: null,
-      setMatch: (match) => set({ match }),
+      setMatch: (match) => set({ match, matchPlaybackStarted: false }),
+
+      matchPlaybackStarted: false,
+      markMatchPlaybackStarted: () => set({ matchPlaybackStarted: true }),
 
       user: null,
       isSignedIn: () => get().user !== null,
@@ -99,7 +108,7 @@ export const useSquadUpStore = create<SquadUpState>()(
 
       rematch: () => {
         get().resetSquads();
-        set({ match: null });
+        set({ match: null, matchPlaybackStarted: false });
       },
     }),
     {
