@@ -212,7 +212,7 @@ export function buildGoalEvent(
       teamScore,
       opponentScore,
     });
-    return { minute, type: "goal" as const, side, ...filled };
+    return { minute, type: "goal" as const, side, scorerId: scorer.player.id, ...filled };
   }
 
   const variantWeights =
@@ -231,7 +231,7 @@ export function buildGoalEvent(
     teamScore,
     opponentScore,
   });
-  return { minute, type: "goal" as const, side, ...filled };
+  return { minute, type: "goal" as const, side, scorerId: scorer.player.id, ...filled };
 }
 
 // --- Filler events ---------------------------------------------------------

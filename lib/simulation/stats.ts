@@ -1,11 +1,54 @@
 // Match stats derived from the same attack/defense ratios rather than
 // simulated event by event — SPEC.md 8.1 step 5.
 
-import type { TeamMatchStats } from "@/lib/types";
+import type { Match, TeamMatchStats } from "@/lib/types";
 
 const SHOTS_PER_EXPECTED_GOAL = 8;
 const ON_TARGET_RATIO = 0.4;
 const TOTAL_PASSES = 850;
+
+export interface MatchStatRow {
+  label: string;
+  homeValue: number;
+  awayValue: number;
+  homeDisplay: string;
+  awayDisplay: string;
+  leading: "home" | "away" | "none";
+}
+
+/**
+ * The four stats in Figma's fixed display order (SPEC.md 5.9/5.10) — shared
+ * by the Match Summary Stats tab and the Share Image's condensed stats block
+ * so both read from the same source of truth.
+ */
+export function matchStatRows(match: Match): MatchStatRow[] {
+  const { home, away } = match.stats;
+  const rows: Omit<MatchStatRow, "leading">[] = [
+    { label: "Shots", homeValue: home.shots, awayValue: away.shots, homeDisplay: String(home.shots), awayDisplay: String(away.shots) },
+    {
+      label: "Shots On Target",
+      homeValue: home.shotsOnTarget,
+      awayValue: away.shotsOnTarget,
+      homeDisplay: String(home.shotsOnTarget),
+      awayDisplay: String(away.shotsOnTarget),
+    },
+    {
+      label: "Possession",
+      homeValue: home.possession,
+      awayValue: away.possession,
+      homeDisplay: `${home.possession}%`,
+      awayDisplay: `${away.possession}%`,
+    },
+    { label: "Passes", homeValue: home.passes, awayValue: away.passes, homeDisplay: String(home.passes), awayDisplay: String(away.passes) },
+  ];
+  return rows.map((row) => ({ ...row, leading: statLeadingSide(row.homeValue, row.awayValue) }));
+}
+
+/** Which side's raw stat value leads, for the Stats tab / Share Image's colored-pill pattern (SPEC.md 5.9/5.10). */
+export function statLeadingSide(homeValue: number, awayValue: number): "home" | "away" | "none" {
+  if (homeValue === awayValue) return "none";
+  return homeValue > awayValue ? "home" : "away";
+}
 
 export function deriveStats(
   lambdaHome: number,
