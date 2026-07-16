@@ -69,14 +69,14 @@ describe("simulateMatch", () => {
     expect(weakWins).toBeGreaterThan(0);
   });
 
-  it("lands total event count in the 8-14 pacing range (SPEC.md 5.7/8.3)", () => {
+  it("lands total event count in the 20-28 pacing range (SPEC.md 5.7/8.3)", () => {
     const home = makeTeam("home", "Home United", 80);
     const away = makeTeam("away", "Away FC", 78);
 
     for (let seed = 0; seed < 50; seed++) {
       const match = simulateMatch(home, away, seed);
-      expect(match.events.length).toBeGreaterThanOrEqual(8);
-      expect(match.events.length).toBeLessThanOrEqual(14);
+      expect(match.events.length).toBeGreaterThanOrEqual(20);
+      expect(match.events.length).toBeLessThanOrEqual(28);
     }
   });
 

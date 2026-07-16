@@ -299,7 +299,7 @@ Selection logic: check for a draw first. Otherwise pick a bucket from goal margi
 ### 8.3 Pacing and output
 
 - **Match structure:** two simulated 20-minute halves, run in 43 real seconds each, with a 4-second halftime break (90 seconds total, fixed).
-- **Pacing:** roughly 8-14 total commentary events across the 90 seconds (mix of single-line and two-line cards), giving an average dwell of 6-11 seconds per event, enough to read a two-line highlight comfortably while the feed still feels busy. A tuning target to playtest and adjust, not a hard requirement.
+- **Pacing:** roughly 20-28 total commentary events across the 90 seconds (mix of single-line and two-line cards), giving an average dwell of ~3-4.5 seconds per event. Retuned up from an initial 8-14/6-11s pass after playtesting found that range left too much dead air; still a tuning target to keep adjusting, not a hard requirement.
 - **Output:** a `Match` object (score, narrative descriptor, and ordered `CommentaryEvent[]`) that the Live Commentary Page, the Timeline tab, and the Share Image all consume from the same source of truth.
 
 ### 8.4 Audio cues

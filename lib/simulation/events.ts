@@ -8,8 +8,12 @@ import { pick, randomInt, weightedPick } from "./rng";
 export const HALF_MINUTES = 20;
 export const MATCH_MINUTES = HALF_MINUTES * 2;
 export const LAST_GASP_WINDOW = 2;
-export const EVENT_COUNT_MIN = 8;
-export const EVENT_COUNT_MAX = 14;
+// Denser than the original 8-14 tuning target (SPEC.md 8.3 flags this range
+// as a tuning target, not a hard requirement) — playtesting found 8-14 left
+// too much dead air across the fixed 90s run. 20-28 events cuts average
+// dwell from ~6-11s down to ~3-4.5s.
+export const EVENT_COUNT_MIN = 20;
+export const EVENT_COUNT_MAX = 28;
 
 const GOAL_TEMPLATES = [
   "GOAL! {player} finds the net for {team}!",
