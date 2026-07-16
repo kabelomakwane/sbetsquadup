@@ -1,8 +1,11 @@
+"use client";
+
 import type { Position, Side } from "./types";
 
 interface PlayerBubbleEmptyProps {
   state: "empty";
   position: Position;
+  onClick?: () => void;
 }
 
 interface PlayerBubbleFilledProps {
@@ -10,6 +13,7 @@ interface PlayerBubbleFilledProps {
   side: Side;
   initials: string;
   playerName: string;
+  onClick?: () => void;
 }
 
 type PlayerBubbleProps = PlayerBubbleEmptyProps | PlayerBubbleFilledProps;
@@ -25,10 +29,19 @@ const filledTextColor: Record<Side, string> = {
 };
 
 export function PlayerBubble(props: PlayerBubbleProps) {
+  const label =
+    props.state === "empty" ? `Select ${props.position} player` : `Change ${props.playerName}`;
+
   return (
-    <div className="flex flex-col items-center gap-1">
+    <button
+      type="button"
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={props.onClick}
+      aria-label={label}
+      className="flex cursor-pointer flex-col items-center gap-1"
+    >
       <div
-        className={`flex size-12 items-center justify-center rounded-pill ${
+        className={`flex size-12 items-center justify-center rounded-pill transition-opacity hover:opacity-80 ${
           props.state === "empty"
             ? "border-2 border-dashed border-white bg-brand-blue"
             : filledBubbleColor[props.side]
@@ -45,6 +58,6 @@ export function PlayerBubble(props: PlayerBubbleProps) {
       {props.state === "filled" && (
         <p className="font-display text-sm font-black italic text-white">{props.playerName}</p>
       )}
-    </div>
+    </button>
   );
 }

@@ -7,6 +7,8 @@ export interface PlayerOption {
   id: string;
   name: string;
   rating: number;
+  /** Natural positions — always shown as a subtitle (Figma 105:791), not just for non-fits. */
+  positions: Position[];
 }
 
 interface PlayerInputProps
@@ -18,6 +20,8 @@ interface PlayerInputProps
   active?: boolean;
   onValueChange?: (value: string) => void;
   onSelect?: (option: PlayerOption) => void;
+  /** Search came back empty — offers a "Use '{value}' anyway" row (SPEC.md 5.4/7 unmatched fallback). */
+  onUseUnmatched?: (value: string) => void;
 }
 
 const tagColor: Record<Side, string> = {
@@ -34,6 +38,7 @@ export function PlayerInput({
   active,
   onValueChange,
   onSelect,
+  onUseUnmatched,
   className = "",
   onFocus,
   onBlur,
@@ -41,10 +46,12 @@ export function PlayerInput({
 }: PlayerInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const filled = value.length > 0;
-  const isOpen = (active ?? isFocused) && options.length > 0;
+  const focused = active ?? isFocused;
+  const isOpen = focused && options.length > 0;
+  const showUnmatched = focused && options.length === 0 && value.trim().length > 0 && Boolean(onUseUnmatched);
 
   return (
-    <div className={`flex w-full flex-col gap-2 ${className}`}>
+    <div className={`relative flex w-full flex-col ${className}`}>
       <div className="flex h-12 w-full items-center rounded-pill bg-white">
         <span
           className={`font-label flex w-[52px] shrink-0 items-center justify-center px-3 text-base font-black not-italic ${tagColor[side]}`}
@@ -63,14 +70,14 @@ export function PlayerInput({
             onBlur?.(event);
           }}
           onChange={(event) => onValueChange?.(event.target.value)}
-          className={`font-body min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
-            filled ? "text-black" : "text-black-60"
+          className={`font-button min-w-0 flex-1 bg-transparent px-3 text-base font-normal not-italic outline-none placeholder:text-black-60 ${
+            filled ? "text-brand-blue" : "text-black-60"
           }`}
           {...props}
         />
       </div>
       {isOpen && (
-        <ul className="flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1">
+        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex max-h-72 w-full flex-col divide-y divide-black/15 overflow-x-hidden overflow-y-auto rounded-3xl bg-white py-1 shadow-lg">
           {options.map((option) => (
             <li key={option.id}>
               <button
@@ -79,15 +86,32 @@ export function PlayerInput({
                 onClick={() => onSelect?.(option)}
                 className="flex w-full items-center hover:bg-black-60/10"
               >
-                <span className="font-label flex w-[52px] shrink-0 items-center justify-center px-3 py-2 text-base font-black not-italic text-brand-blue">
+                <span className="font-label flex w-[30px] shrink-0 items-center justify-center px-3 py-2 text-base font-black not-italic text-brand-blue">
                   {option.rating}
                 </span>
-                <span className="font-body flex-1 px-3 py-2 text-left text-base font-normal not-italic text-black">
-                  {option.name}
+                <span className="flex flex-1 flex-col items-start px-3 py-2 text-left">
+                  <span className="font-button text-base font-normal not-italic text-black">{option.name}</span>
+                  <span className="text-[8px] text-black/50">{option.positions.join(" • ")}</span>
                 </span>
               </button>
             </li>
           ))}
+        </ul>
+      )}
+      {showUnmatched && (
+        <ul className="absolute left-0 right-0 top-full z-20 mt-2 flex w-full flex-col overflow-hidden rounded-3xl bg-white py-1 shadow-lg">
+          <li>
+            <button
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => onUseUnmatched?.(value)}
+              className="flex w-full items-center px-3 py-2 hover:bg-black-60/10"
+            >
+              <span className="font-body text-left text-base font-normal not-italic text-black">
+                Use &ldquo;{value}&rdquo; anyway
+              </span>
+            </button>
+          </li>
         </ul>
       )}
     </div>
