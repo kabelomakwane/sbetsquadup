@@ -103,6 +103,7 @@ export function searchPlayers(query: string, slotPosition: Position, limit = 6):
 
 /** "Virgil van Dijk" -> "VvD", "Neymar Jr" -> "NJ", "Erling Haaland" -> "EH" */
 export function getPlayerInitials(name: string): string {
+  if (!name) return "";
   return name
     .trim()
     .split(/\s+/)

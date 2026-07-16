@@ -27,6 +27,44 @@ function makeMatch(id: string, home: Team, away: Team): Match {
   };
 }
 
+// Regression: a `user` persisted before User.name existed (v0) must be
+// backfilled with a name on load, not crash getPlayerInitials(undefined)
+// downstream (the Netlify deploy-preview bug this migration fixes).
+describe("useSquadUpStore persist migration", () => {
+  it("backfills a missing User.name on old (v0) persisted state", () => {
+    const migrate = useSquadUpStore.persist.getOptions().migrate;
+    expect(migrate).toBeDefined();
+
+    const oldState = {
+      ageConfirmed: true,
+      user: { id: "user-1", authProvider: "email", signedInAt: 1 },
+      match: null,
+      matchPlaybackStarted: false,
+      savedSquads: [],
+      matchHistory: [],
+    };
+
+    const migrated = migrate!(oldState, 0) as typeof oldState & { user: { name?: string } };
+    expect(migrated.user?.name).toBeTruthy();
+    expect(typeof migrated.user?.name).toBe("string");
+  });
+
+  it("leaves a user that already has a name untouched", () => {
+    const migrate = useSquadUpStore.persist.getOptions().migrate;
+    const oldState = {
+      ageConfirmed: true,
+      user: { id: "user-1", authProvider: "email", signedInAt: 1, name: "Existing Name" },
+      match: null,
+      matchPlaybackStarted: false,
+      savedSquads: [],
+      matchHistory: [],
+    };
+
+    const migrated = migrate!(oldState, 1) as typeof oldState;
+    expect(migrated.user?.name).toBe("Existing Name");
+  });
+});
+
 // SPEC.md 9: SavedSquad/MatchHistory persistence tied to the mocked User.
 describe("useSquadUpStore persistence", () => {
   beforeEach(() => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { randomDisplayName } from "@/lib/data/displayNames";
 import {
   POSITION_SLOTS,
   type Match,
@@ -166,6 +167,26 @@ export const useSquadUpStore = create<SquadUpState>()(
         savedSquads: state.savedSquads,
         matchHistory: state.matchHistory,
       }),
+      // v1 added User.name (SPEC.md 5.12) after some sessions had already
+      // persisted a `user` without one — backfill it on load rather than
+      // leaving old sessions with a broken (crashing) account icon.
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as
+          | {
+              ageConfirmed: boolean;
+              user: User | null;
+              match: Match | null;
+              matchPlaybackStarted: boolean;
+              savedSquads: SavedSquad[];
+              matchHistory: MatchHistory[];
+            }
+          | undefined;
+        if (state?.user && !state.user.name) {
+          return { ...state, user: { ...state.user, name: randomDisplayName() } };
+        }
+        return state;
+      },
     },
   ),
 );
