@@ -53,9 +53,16 @@ interface SquadUpState {
   // Saved squads / history — SPEC.md 7.
   savedSquads: SavedSquad[];
   addSavedSquad: (squad: SavedSquad) => void;
+  deleteSavedSquad: (id: string) => void;
 
   matchHistory: MatchHistory[];
   addMatchHistory: (entry: MatchHistory) => void;
+
+  // Profile "Play"/"Rematch" pre-fill (SPEC.md 5.12) — distinct from
+  // `rematch()` below, which wipes both squads for Match Summary's own
+  // "Rematch" button. These load *specific* teams instead.
+  loadSavedSquad: (team: Team) => void;
+  loadMatchTeams: (match: Match) => void;
 
   // Match Summary "Rematch" — SPEC.md 4, step 7: back to Team Picker, squads reset.
   rematch: () => void;
@@ -110,6 +117,8 @@ export const useSquadUpStore = create<SquadUpState>()(
             ? state
             : { savedSquads: [...state.savedSquads, squad] },
         ),
+      deleteSavedSquad: (id) =>
+        set((state) => ({ savedSquads: state.savedSquads.filter((squad) => squad.id !== id) })),
 
       matchHistory: [],
       // Keyed on match.id, same StrictMode double-invoke reasoning as above.
@@ -119,6 +128,22 @@ export const useSquadUpStore = create<SquadUpState>()(
             ? state
             : { matchHistory: [...state.matchHistory, entry] },
         ),
+
+      // Loads `team` into its own side, clears the OTHER side to empty
+      // (SPEC.md 5.12) — fresh ids on both so Kick Off's dedupe-by-team.id
+      // treats a replayed/edited squad as its own new SavedSquad snapshot.
+      loadSavedSquad: (team) => {
+        const otherSide: Side = team.side === "home" ? "away" : "home";
+        set({
+          [team.side === "home" ? "homeTeam" : "awayTeam"]: { ...team, id: crypto.randomUUID() },
+          [otherSide === "home" ? "homeTeam" : "awayTeam"]: emptyTeam(otherSide),
+        });
+      },
+      loadMatchTeams: (match) =>
+        set({
+          homeTeam: { ...match.homeTeam, id: crypto.randomUUID() },
+          awayTeam: { ...match.awayTeam, id: crypto.randomUUID() },
+        }),
 
       rematch: () => {
         get().resetSquads();

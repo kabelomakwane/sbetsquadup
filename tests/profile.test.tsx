@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { POSITION_SLOTS, type Match, type Team } from "@/lib/types";
 import { useSquadUpStore } from "@/store/useSquadUpStore";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 import ProfilePage from "@/app/profile/page";
@@ -45,7 +46,7 @@ describe("ProfilePage", () => {
   });
 
   it("lists only the signed-in user's saved squads and match history", () => {
-    const user = { id: "user-1", authProvider: "email" as const, signedInAt: 1 };
+    const user = { id: "user-1", authProvider: "email" as const, signedInAt: 1, name: "Test Manager" };
     const otherUsersTeam = makeTeam("home", "other-team", "Not Mine FC");
     const myTeam = makeTeam("home", "my-team", "My Dream Team");
     const myAway = makeTeam("away", "my-away", "Rivals FC");
@@ -68,8 +69,17 @@ describe("ProfilePage", () => {
 
     render(<ProfilePage />);
 
+    // Default tab is Squads — only the signed-in user's squad shows, the
+    // other user's is filtered out entirely.
     expect(screen.getAllByText(/my dream team/i).length).toBeGreaterThan(0);
     expect(screen.queryByText(/not mine fc/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/my dream team 2 - 1 rivals fc/i)).toBeInTheDocument();
+
+    // Switch to History — ScoreBug renders team names/scores as separate
+    // DOM nodes, so assert on the still-single-text-node narrative instead
+    // of a combined score-line string.
+    fireEvent.click(screen.getByRole("button", { name: "History" }));
+    expect(screen.getByText(/a tense affair/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/my dream team/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/rivals fc/i)).toBeInTheDocument();
   });
 });

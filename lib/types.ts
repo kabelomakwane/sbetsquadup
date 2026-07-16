@@ -78,6 +78,9 @@ export interface User {
   id: string;
   authProvider: AuthProvider;
   signedInAt: number;
+  // Generated once at mock login() time — SPEC.md 5.12. A real OAuth
+  // provider would supply this directly instead.
+  name: string;
 }
 
 export interface SavedSquad {

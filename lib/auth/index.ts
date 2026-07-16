@@ -5,6 +5,7 @@
 // is swapped for real Facebook/Google/Apple/Email OAuth.
 
 import { useSquadUpStore } from "@/store/useSquadUpStore";
+import { randomDisplayName } from "@/lib/data/displayNames";
 import type { AuthProvider, User } from "@/lib/types";
 
 export type { AuthProvider, User } from "@/lib/types";
@@ -14,6 +15,7 @@ export async function login(provider: AuthProvider): Promise<User> {
     id: crypto.randomUUID(),
     authProvider: provider,
     signedInAt: Date.now(),
+    name: randomDisplayName(),
   };
   useSquadUpStore.getState().signIn(user);
   return user;

@@ -106,3 +106,68 @@ describe("useSquadUpStore persistence", () => {
     expect(state.matchHistory).toHaveLength(1);
   });
 });
+
+// SPEC.md 5.12: Profile "Play"/"Rematch" pre-fill and squad deletion.
+describe("useSquadUpStore Profile actions", () => {
+  beforeEach(() => {
+    useSquadUpStore.setState({
+      savedSquads: [],
+      matchHistory: [],
+      homeTeam: makeTeam("home", "initial-home"),
+      awayTeam: makeTeam("away", "initial-away"),
+    });
+  });
+
+  it("deleteSavedSquad removes only the matching squad by id", () => {
+    const home1 = makeTeam("home", "team-home-1");
+    const home2 = makeTeam("home", "team-home-2");
+    useSquadUpStore.getState().addSavedSquad({ id: "s1", userId: "user-1", team: home1, createdAt: 1 });
+    useSquadUpStore.getState().addSavedSquad({ id: "s2", userId: "user-1", team: home2, createdAt: 2 });
+
+    useSquadUpStore.getState().deleteSavedSquad("s1");
+
+    const state = useSquadUpStore.getState();
+    expect(state.savedSquads.map((s) => s.id)).toEqual(["s2"]);
+  });
+
+  it("loadSavedSquad writes a home squad into homeTeam and clears awayTeam", () => {
+    const home = makeTeam("home", "saved-home");
+    home.name = "Saved Home Squad";
+
+    useSquadUpStore.getState().loadSavedSquad(home);
+
+    const state = useSquadUpStore.getState();
+    expect(state.homeTeam.name).toBe("Saved Home Squad");
+    expect(state.homeTeam.id).not.toBe(home.id);
+    expect(state.awayTeam.name).toBe("");
+    expect(state.awayTeam.players.every((p) => p === undefined)).toBe(true);
+  });
+
+  it("loadSavedSquad writes an away squad into awayTeam and clears homeTeam", () => {
+    const away = makeTeam("away", "saved-away");
+    away.name = "Saved Away Squad";
+
+    useSquadUpStore.getState().loadSavedSquad(away);
+
+    const state = useSquadUpStore.getState();
+    expect(state.awayTeam.name).toBe("Saved Away Squad");
+    expect(state.awayTeam.id).not.toBe(away.id);
+    expect(state.homeTeam.name).toBe("");
+  });
+
+  it("loadMatchTeams writes both sides from the match with fresh ids", () => {
+    const home = makeTeam("home", "match-home");
+    home.name = "Match Home";
+    const away = makeTeam("away", "match-away");
+    away.name = "Match Away";
+    const match = makeMatch("match-1", home, away);
+
+    useSquadUpStore.getState().loadMatchTeams(match);
+
+    const state = useSquadUpStore.getState();
+    expect(state.homeTeam.name).toBe("Match Home");
+    expect(state.homeTeam.id).not.toBe(home.id);
+    expect(state.awayTeam.name).toBe("Match Away");
+    expect(state.awayTeam.id).not.toBe(away.id);
+  });
+});
