@@ -12,14 +12,14 @@ import { useSquadUpStore } from "@/store/useSquadUpStore";
 import { useMatchPlayback } from "./useMatchPlayback";
 
 function CommentaryRow({ event }: { event: CommentaryEvent }) {
-  if (event.type === "goal") {
+  if (event.headline) {
     return (
       <CommentaryEventRow
         variant="keyMoment"
         minute={event.minute}
         side={event.side ?? "home"}
-        headline="GOAL!"
-        text={event.text.replace(/^GOAL!\s*/i, "")}
+        headline={event.headline}
+        text={event.text}
       />
     );
   }
