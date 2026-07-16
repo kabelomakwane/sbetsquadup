@@ -29,6 +29,9 @@ export default function LandingPage() {
         <PillButton buttonStyle="tertiary" onClick={() => router.push("/how-to-play")}>
           How To Play
         </PillButton>
+        <PillButton buttonStyle="link" onClick={() => router.push("/profile")}>
+          My Profile
+        </PillButton>
       </div>
     </main>
   );

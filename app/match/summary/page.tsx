@@ -12,7 +12,7 @@ import { ShareSheetModal } from "@/components/ShareSheetModal";
 import { StatLine } from "@/components/StatLine";
 import { TabPicker } from "@/components/TabPicker";
 import { matchStatRows, playerGoalCounts, teamLineupRows } from "@/lib/simulation";
-import { useSquadUpStore } from "@/store/useSquadUpStore";
+import { useHasHydrated, useSquadUpStore } from "@/store/useSquadUpStore";
 
 const TABS = ["Stats", "Lineups", "Timeline"] as const;
 type Tab = (typeof TABS)[number];
@@ -20,14 +20,19 @@ type Tab = (typeof TABS)[number];
 // SPEC.md 5.9 Match Summary Page (Figma 68:704) — flow step 6-7.
 export default function MatchSummaryPage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
   const match = useSquadUpStore((state) => state.match);
   const rematch = useSquadUpStore((state) => state.rematch);
   const [activeTab, setActiveTab] = useState<Tab>("Stats");
   const [isShareOpen, setIsShareOpen] = useState(false);
 
+  // Waits for hasHydrated for the same reason as Match Result: persisted
+  // `match` (SPEC.md 9) loads after the first render, so checking it at
+  // mount before hydration finishes would wrongly redirect a returning user.
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!match) router.replace("/team-picker");
-  }, [match, router]);
+  }, [hasHydrated, match, router]);
 
   const goalCounts = useMemo(() => (match ? playerGoalCounts(match) : new Map<string, number>()), [match]);
   const homeRows = useMemo(() => (match ? teamLineupRows(match.homeTeam, goalCounts) : []), [match, goalCounts]);
@@ -43,7 +48,7 @@ export default function MatchSummaryPage() {
     router.push("/team-picker");
   };
 
-  if (!match) return null;
+  if (!hasHydrated || !match) return null;
 
   return (
     <main className="flex flex-1 flex-col items-center gap-16 px-6 py-16 text-center">
