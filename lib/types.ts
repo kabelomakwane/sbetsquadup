@@ -45,6 +45,14 @@ export interface CommentaryEvent {
 
 export type MatchStatus = "loading" | "live" | "finished";
 
+// Derived (not separately simulated) — SPEC.md 8.1 step 5.
+export interface TeamMatchStats {
+  shots: number;
+  shotsOnTarget: number;
+  possession: number; // 0-100, home + away sum to 100
+  passes: number;
+}
+
 export interface Match {
   id: string;
   homeTeam: Team;
@@ -53,6 +61,7 @@ export interface Match {
   finalScore: { home: number; away: number };
   narrativeDescriptor: string;
   status: MatchStatus;
+  stats: { home: TeamMatchStats; away: TeamMatchStats };
 }
 
 export type AuthProvider = "facebook" | "google" | "apple" | "email";
