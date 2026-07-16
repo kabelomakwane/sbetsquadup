@@ -64,10 +64,12 @@ export default function LiveCommentaryPage() {
     }
   }, [playback.phase, router]);
 
+  // Newest event renders at the top (see below), so keep the feed pinned to
+  // the top as new ones arrive rather than chasing the bottom.
   const feedRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = feedRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = 0;
   }, [playback.revealedEvents]);
 
   if (!match || wasAlreadyStarted) return null;
@@ -80,8 +82,11 @@ export default function LiveCommentaryPage() {
         ? "full-time"
         : "default";
 
-  const firstHalfEvents = playback.revealedEvents.filter((event) => event.minute <= HALF_MINUTES);
-  const secondHalfEvents = playback.revealedEvents.filter((event) => event.minute > HALF_MINUTES);
+  // Most-recent-first: reverse each half's chronological slice so newest
+  // lands at the top, with the halftime marker sitting between them (it's
+  // "older" than any second-half event but "newer" than every first-half one).
+  const firstHalfEvents = playback.revealedEvents.filter((event) => event.minute <= HALF_MINUTES).reverse();
+  const secondHalfEvents = playback.revealedEvents.filter((event) => event.minute > HALF_MINUTES).reverse();
   const showHalfTimeMarker = playback.phase !== "first-half";
 
   const handleSkip = () => router.push("/match/result");
@@ -153,12 +158,12 @@ export default function LiveCommentaryPage() {
         ref={feedRef}
         className="flex w-full max-w-[500px] flex-1 flex-col gap-6 overflow-y-auto scroll-smooth"
       >
-        {firstHalfEvents.map((event, index) => (
-          <CommentaryRow key={`first-${index}`} event={event} />
-        ))}
-        {showHalfTimeMarker && <CommentaryEventRow variant="halfTime" />}
         {secondHalfEvents.map((event, index) => (
           <CommentaryRow key={`second-${index}`} event={event} />
+        ))}
+        {showHalfTimeMarker && <CommentaryEventRow variant="halfTime" />}
+        {firstHalfEvents.map((event, index) => (
+          <CommentaryRow key={`first-${index}`} event={event} />
         ))}
       </div>
     </main>
