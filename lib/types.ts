@@ -44,6 +44,11 @@ export interface CommentaryEvent {
   // Present only for two-line "highlight" events (goals, saves, posts,
   // last-ditch defensive plays) — SPEC.md 5.7/8.1.
   headline?: string;
+  // Present only on "goal" events — the scoring Player's id, so per-player
+  // goal tallies (Lineups tab, Share Image ball icons — SPEC.md 5.9/5.10,
+  // LineupEntry.goals in section 7) can be derived from the event list
+  // without re-simulating anything.
+  scorerId?: string;
 }
 
 export type MatchStatus = "loading" | "live" | "finished";
