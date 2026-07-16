@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { PillButton } from "@/components/PillButton";
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH, ShareImageCard } from "@/components/ShareImageCard";
 import { downloadDataUrl, shareImageToDataUrl } from "@/lib/share/shareImage";
-import { useSquadUpStore } from "@/store/useSquadUpStore";
+import { useHasHydrated, useSquadUpStore } from "@/store/useSquadUpStore";
 
 // SPEC.md 5.10 Share Image (Figma 73:1629) — the shareable result card,
 // generated on match end. The product flow reaches it through the Share
@@ -13,15 +13,20 @@ import { useSquadUpStore } from "@/store/useSquadUpStore";
 // standalone full-resolution preview/download, useful for QA against Figma.
 export default function ShareImagePage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
   const match = useSquadUpStore((state) => state.match);
   const cardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
 
+  // Persisted `match` (SPEC.md 9) loads after the first render — wait for
+  // hasHydrated so a hard reload here doesn't bounce a returning user away
+  // before it loads.
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!match) router.replace("/team-picker");
-  }, [match, router]);
+  }, [hasHydrated, match, router]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -44,7 +49,7 @@ export default function ShareImagePage() {
     }
   };
 
-  if (!match) return null;
+  if (!hasHydrated || !match) return null;
 
   return (
     <main className="flex flex-1 flex-col items-center gap-8 px-6 py-12">

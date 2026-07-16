@@ -8,7 +8,7 @@ import { PillButton } from "@/components/PillButton";
 import { ScoreBug } from "@/components/ScoreBug";
 import { HALF_MINUTES } from "@/lib/simulation";
 import type { CommentaryEvent } from "@/lib/types";
-import { useSquadUpStore } from "@/store/useSquadUpStore";
+import { useHasHydrated, useSquadUpStore } from "@/store/useSquadUpStore";
 import { useMatchPlayback } from "./useMatchPlayback";
 
 function CommentaryRow({ event }: { event: CommentaryEvent }) {
@@ -29,22 +29,35 @@ function CommentaryRow({ event }: { event: CommentaryEvent }) {
 // SPEC.md 5.7 Live Commentary Page (Figma 68:634) — flow step 4-5.
 export default function LiveCommentaryPage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
   const match = useSquadUpStore((state) => state.match);
   const matchPlaybackStarted = useSquadUpStore((state) => state.matchPlaybackStarted);
   const markMatchPlaybackStarted = useSquadUpStore((state) => state.markMatchPlaybackStarted);
 
-  // Snapshot at mount, not the live store value: markMatchPlaybackStarted()
-  // below flips the store flag true right after mount, and re-deriving from
-  // the live value would immediately tear the just-started hook back down.
-  const [wasAlreadyStarted] = useState(matchPlaybackStarted);
+  // Snapshot taken once, the first time hasHydrated flips true — not the
+  // live store value, since markMatchPlaybackStarted() below flips the
+  // store flag true right after the decision, and re-deriving from the live
+  // value would immediately tear the just-started hook back down. null means
+  // "not decided yet" (either still waiting on hydration, or this render
+  // hasn't captured it). Set during render rather than in an effect — React's
+  // sanctioned pattern for "reset/derive state once when a condition first
+  // becomes true" (see https://react.dev/learn/you-might-not-need-an-effect).
+  const [wasAlreadyStarted, setWasAlreadyStarted] = useState<boolean | null>(null);
+  if (hasHydrated && wasAlreadyStarted === null) {
+    setWasAlreadyStarted(matchPlaybackStarted);
+  }
 
   // Mid-match exit (SPEC.md 5.7/9): the Match is generated in full before this
   // page ever plays a frame, so re-entering after having left mid-playback
   // (or after it finished) has nothing to resume — drop straight on the
-  // result. This covers in-session navigation (SPA back/forward, or typing
-  // the URL again); it doesn't survive a hard tab close/reopen, since match
-  // state isn't persisted to localStorage.
+  // result. match/matchPlaybackStarted are both persisted to localStorage
+  // (see useSquadUpStore's partialize), so this covers a hard tab close and
+  // reopen too, not just in-session navigation — but persisted state only
+  // loads after the first render, so this waits for wasAlreadyStarted to be
+  // decided (above) rather than judging "no match" from the pre-hydration
+  // default.
   useEffect(() => {
+    if (wasAlreadyStarted === null) return;
     if (!match) {
       router.replace("/team-picker");
       return;
@@ -54,9 +67,9 @@ export default function LiveCommentaryPage() {
       return;
     }
     markMatchPlaybackStarted();
-  }, [match, wasAlreadyStarted, markMatchPlaybackStarted, router]);
+  }, [wasAlreadyStarted, match, markMatchPlaybackStarted, router]);
 
-  const playback = useMatchPlayback(wasAlreadyStarted ? null : match);
+  const playback = useMatchPlayback(wasAlreadyStarted === false ? match : null);
 
   useEffect(() => {
     if (playback.phase === "full-time") {
@@ -72,7 +85,7 @@ export default function LiveCommentaryPage() {
     if (el) el.scrollTop = 0;
   }, [playback.revealedEvents]);
 
-  if (!match || wasAlreadyStarted) return null;
+  if (!match || wasAlreadyStarted !== false) return null;
 
   const timerState = playback.isPaused
     ? "paused"

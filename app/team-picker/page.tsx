@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Avatar } from "@/components/Avatar";
 import { Heading } from "@/components/Heading";
 import { PillButton } from "@/components/PillButton";
 import { ErrorChip } from "@/components/ErrorChip";
@@ -9,7 +10,7 @@ import { Field, type TeamSlots } from "@/components/Field";
 import { getSession } from "@/lib/auth";
 import { getPlayerInitials, getShortPlayerName } from "@/lib/data/players";
 import { POSITION_SLOTS, type Team } from "@/lib/types";
-import { useSquadUpStore } from "@/store/useSquadUpStore";
+import { useHasHydrated, useSquadUpStore } from "@/store/useSquadUpStore";
 import { SquadColumn, playerInputId, type PickError } from "./SquadColumn";
 
 // index 0..4 of POSITION_SLOTS (ST, MID, MID, DEF, GK) maps onto Field's named slots.
@@ -26,6 +27,8 @@ function teamToSlots(team: Team): TeamSlots {
 // SPEC.md 5.4 Team Picker (Figma 68:487 empty / 70:952 complete) — flow step 3.
 export default function TeamPickerPage() {
   const router = useRouter();
+  const hasHydrated = useHasHydrated();
+  const user = useSquadUpStore((state) => state.user);
   const homeTeam = useSquadUpStore((state) => state.homeTeam);
   const awayTeam = useSquadUpStore((state) => state.awayTeam);
   const [pickError, setPickError] = useState<PickError | null>(null);
@@ -41,7 +44,21 @@ export default function TeamPickerPage() {
   };
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-8 px-8 py-12">
+    <main className="relative flex flex-1 flex-col items-center gap-8 px-8 py-12">
+      {/* Account icon, top corner — SPEC.md 5.12, same treatment as Landing. */}
+      {hasHydrated && user && (
+        <div className="absolute top-6 right-6">
+          <button
+            type="button"
+            onClick={() => router.push("/profile")}
+            aria-label="My Profile"
+            className="cursor-pointer"
+          >
+            <Avatar initials={getPlayerInitials(user.name)} size="regular" />
+          </button>
+        </div>
+      )}
+
       <Heading level={1} className="text-center">
         Select your dream team
       </Heading>

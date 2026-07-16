@@ -154,6 +154,17 @@ There's no separate full-page route for this. The frame is effectively the Match
 
 Note on labeling: resolved, "Rematch" is the confirmed label for this action everywhere it appears (this modal, and the plain Match Summary Page in section 5.9, updated above). The flow diagram's original 'New Game' wording only applies to the separate first-entry button on the Landing Page (section 4, step 2).
 
+### 5.12 Profile / History Page — no Figma frame, built to written spec
+
+Where a signed-in user sees their saved squads, past match results, and basic career stats. Not part of the main numbered flow (section 4) — it's reached via a small account icon (avatar/initials, from the mocked `User`) in the top corner of the Landing Page and Team Picker, the two screens someone returns to repeatedly. Signed-out users get no icon at all, there's nothing to show them yet (section 9's auth gating).
+
+- **Layout:** one persistent identity header (avatar, display name, "{gamesPlayed} games played", Sign Out), then a tab group (same pill component as Match Summary's tabs) for **Squads** / **History** / **Stats**, with the active tab synced into the URL (`?tab=`) so returning from a match-detail View lands back on the right tab.
+- **Squads tab:** a card per `SavedSquad`, most recent first — team name (brand color per the squad's side), a compact row of 5 small player-bubble icons in position order, created date, **Play** (loads that squad into its side on Team Picker, clears the other side, then goes there to kick off) and **Delete** (inline "Delete this squad? Yes/No" confirm, no modal).
+- **History tab:** a row per `MatchHistory` entry, most recent first — the Score Bug (reused as-is, `showTimer={false}`), the match's `narrativeDescriptor` as a subtitle, date played, **View** (a read-only version of the Match Summary tabs for that match, at its own route so it doesn't disturb the live/current `match` in the store) and **Rematch** (loads both squads from that match onto Team Picker, clearing the current squads first).
+- **Stats tab:** computed client-side from `MatchHistory`, no new persisted fields — Played, Won, Drawn, Lost, Goals For, Goals Against, Win %. Since the player builds *both* squads every match (there's no single "my team"), Won/Drawn/Lost is a fixed home-side convention (a "win" = the home squad won that match), not a true personal record.
+- **Empty states**, one per tab: Squads → "You haven't built a squad yet." + Build a Squad; History → "You haven't played a match yet." + Kick Off; Stats → "Play a match to see your stats here." (no CTA, the other two tabs already offer one).
+- **Data model confirmation:** `Match` embeds full `Team` snapshots inline (not a reference back to a `SavedSquad` id), so deleting a `SavedSquad` never orphans or corrupts a past `MatchHistory` result.
+
 ## 6. Design system (extracted from Figma)
 
 **Colors**
@@ -228,6 +239,7 @@ User
   id
   authProvider: "facebook" | "google" | "apple" | "email" (mocked for this build phase, see section 9)
   signedInAt: timestamp
+  name: string (generated once at mock login time, see section 5.12 — a real OAuth provider would supply this directly)
 
 SavedSquad
   id
@@ -324,7 +336,7 @@ Confirmed scope: ambient crowd noise plus sound effects, toggled together by Mut
 - Kick Off triggers the signed-in check. If not signed in, the user is sent to Sign In/Up and, on success, continues to the Game Loading Screen with the squads they already built intact.
 - Once signed in for the session, subsequent 'Rematch' loops shouldn't re-prompt for sign-in.
 - **For this build phase, auth is mocked** (enough to demo the full flow, not real Facebook/Google/Apple/Email OAuth). Build it behind a simple auth interface (a `login(provider)` / `getSession()` abstraction) so the mock implementation can be swapped for real OAuth providers later without touching the screens that call it.
-- **Persistence:** built squads and match results save to a user profile/history. There's no design for this view yet, you'll design those frames later, so Claude Code should scaffold it functionally now (plain list UI is fine for v1) so the feature actually works end to end. At minimum this implies `SavedSquad` and `MatchHistory` records tied to a `User`, both listed in the data model below.
+- **Persistence:** built squads and match results save to a user profile/history — see section 5.12 for the built design. At minimum this implies `SavedSquad` and `MatchHistory` records tied to a `User`, both listed in the data model below.
 - **Mid-match exit:** since the `Match` object (full score, scorer, and event list) is generated in one shot before playback starts (section 8.3), persist it the moment it's created, not when playback finishes. If the user closes the tab or navigates away mid-commentary and comes back, skip re-playing the feed and drop them straight on the result (End of Match Page or Summary), since the outcome already exists and re-watching a fixed replay adds nothing. No separate "abandoned match" state needed, a match is either generated (and therefore has a real result to show) or it doesn't exist yet.
 
 ## 10. Non-functional requirements
@@ -352,7 +364,7 @@ Everything that was an open decision is now answered. What's left is execution w
 
 1. **How to Play voice pass:** the six-step script (5.3) is a first draft, worth a pass to match your voice before it's final, and the tooltip cards themselves still need a visual design (yours, or a first-cut default from Claude Code).
 2. **Player database build-out:** the schema and fallback rule are ready (section 7), but actually sourcing and populating an expansive, license-free player list (last 20 years of top players, plus legends) is a real content workstream to plan separately from the app build.
-3. **Profile/history frames:** Claude Code scaffolds this functionally now; swap in your visual design once those frames exist.
+3. **Profile/history frames:** built to a written design spec (section 5.12) rather than a Figma frame — still genuinely no Figma frame for this screen, and CLAUDE.md's "functional over polished" carve-out for it stands.
 4. **Share icon brand compliance:** pull the current X and WhatsApp brand guidelines before shipping those two buttons.
 5. **Playtest and tune:** the outcome model's base rate constant (`1.3`), the commentary event count (20-28) and category weights (8.1 step 6), and the narrative phrase banks (8.2) are all starting points, expect to adjust each once there's a working build to actually play.
 6. **Profanity filter word list:** needs sourcing (open-source profanity-filter packages exist, this is a small lift), plus a decision on language coverage beyond English given SBET's audience (see 5.4).
@@ -374,6 +386,7 @@ Everything that was an open decision is now answered. What's left is execution w
 | Share Image (result card) | `73:1629` | generated on match end, previewed in Share Sheet |
 | Share Sheet (modal over Summary page) | `73:1779` (modal at `73:1927`) | Share Sheet |
 | How to Play | not in file | How to Play |
+| Profile / History | not in file | reached via the account icon, section 5.12 |
 
 Figma file: https://www.figma.com/design/HNoSCSlGQpPsSJheVrkojZ/Squad-Up?node-id=68-462
 
