@@ -3,16 +3,33 @@
 // CLAUDE.md "Architecture rules" for why: a future multiplayer server needs
 // to run this same function).
 
-import type { CommentaryEvent, Match, Player, Team } from "@/lib/types";
+import type { CommentaryEvent, Match, Player, Side, Team } from "@/lib/types";
 import { attackDefense, slotRatings } from "./rating";
+import type { SlotRating } from "./rating";
 import { buildNarrativeDescriptor } from "./narrative";
 import { pickScorer, scorerPriority } from "./scorers";
 import { deriveStats } from "./stats";
-import { buildFillerEvents, buildGoalEvent, EVENT_COUNT_MAX, EVENT_COUNT_MIN, LAST_GASP_WINDOW, MATCH_MINUTES } from "./events";
+import {
+  buildFillerEvents,
+  buildFixedPointEvents,
+  buildGoalEvent,
+  EVENT_COUNT_MAX,
+  EVENT_COUNT_MIN,
+  HALF_MINUTES,
+  LAST_GASP_WINDOW,
+  MATCH_MINUTES,
+  randomNonFixedMinute,
+} from "./events";
 import { createRng, randomInt, samplePoisson } from "./rng";
 
 const BASE_RATE = 1.3;
 const MAX_GOALS_PER_SIDE = 8;
+
+interface PendingGoal {
+  minute: number;
+  side: Side;
+  scorer: SlotRating;
+}
 
 export function simulateMatch(homeTeam: Team, awayTeam: Team, seed: number): Match {
   const rng = createRng(seed);
@@ -34,24 +51,64 @@ export function simulateMatch(homeTeam: Team, awayTeam: Team, seed: number): Mat
 
   const homeGoalTally = new Map<Player, number>();
   const awayGoalTally = new Map<Player, number>();
-  const goalEvents: CommentaryEvent[] = [];
+  const pendingGoals: PendingGoal[] = [];
 
   for (let i = 0; i < homeGoals; i++) {
     const scorer = pickScorer(rng, homeScorerPriority);
     homeGoalTally.set(scorer.player, (homeGoalTally.get(scorer.player) ?? 0) + 1);
-    goalEvents.push(buildGoalEvent(rng, randomInt(rng, 1, MATCH_MINUTES), "home", homeTeam, scorer.player));
+    pendingGoals.push({ minute: randomNonFixedMinute(rng), side: "home", scorer });
   }
   for (let i = 0; i < awayGoals; i++) {
     const scorer = pickScorer(rng, awayScorerPriority);
     awayGoalTally.set(scorer.player, (awayGoalTally.get(scorer.player) ?? 0) + 1);
-    goalEvents.push(buildGoalEvent(rng, randomInt(rng, 1, MATCH_MINUTES), "away", awayTeam, scorer.player));
+    pendingGoals.push({ minute: randomNonFixedMinute(rng), side: "away", scorer });
   }
+  // Chronological order so each goal's on-screen scoreline reflects the
+  // running tally at that point in the match, not the final score.
+  pendingGoals.sort((a, b) => a.minute - b.minute);
+
+  let runningHome = 0;
+  let runningAway = 0;
+  const goalEvents: CommentaryEvent[] = pendingGoals.map((goal) => {
+    if (goal.side === "home") runningHome++;
+    else runningAway++;
+
+    const team = goal.side === "home" ? homeTeam : awayTeam;
+    const opponent = goal.side === "home" ? awayTeam : homeTeam;
+    const teamScore = goal.side === "home" ? runningHome : runningAway;
+    const opponentScore = goal.side === "home" ? runningAway : runningHome;
+
+    return buildGoalEvent(rng, goal.minute, goal.side, team, opponent, goal.scorer, teamScore, opponentScore);
+  });
+
+  const halftimeHomeGoals = pendingGoals.filter((goal) => goal.side === "home" && goal.minute < HALF_MINUTES).length;
+  const halftimeAwayGoals = pendingGoals.filter((goal) => goal.side === "away" && goal.minute < HALF_MINUTES).length;
+
+  const stats = deriveStats(lambdaHome, lambdaAway, attackHome, attackAway, homeGoals, awayGoals);
+
+  const fixedPointEvents: CommentaryEvent[] = buildFixedPointEvents(
+    rng,
+    homeTeam,
+    awayTeam,
+    halftimeHomeGoals,
+    halftimeAwayGoals,
+    homeGoals,
+    awayGoals,
+  );
 
   const targetTotal = randomInt(rng, EVENT_COUNT_MIN, EVENT_COUNT_MAX);
-  const fillerCount = Math.max(0, targetTotal - goalEvents.length);
-  const fillerEvents = buildFillerEvents(rng, fillerCount, homeTeam, awayTeam, attackHome, attackAway);
+  const fillerCount = Math.max(0, targetTotal - goalEvents.length - fixedPointEvents.length);
+  const fillerEvents: CommentaryEvent[] = buildFillerEvents(rng, fillerCount, attackHome, attackAway, {
+    homeTeam,
+    awayTeam,
+    stats,
+    homeStandout: homeScorerPriority[0].player,
+    awayStandout: awayScorerPriority[0].player,
+    homeGoals,
+    awayGoals,
+  });
 
-  const events = [...goalEvents, ...fillerEvents].sort((a, b) => a.minute - b.minute);
+  const events = [...goalEvents, ...fixedPointEvents, ...fillerEvents].sort((a, b) => a.minute - b.minute);
 
   const hasLastGasp = goalEvents.some((event) => event.minute >= MATCH_MINUTES - LAST_GASP_WINDOW + 1);
 
@@ -64,8 +121,6 @@ export function simulateMatch(homeTeam: Team, awayTeam: Team, seed: number): Mat
     awayGoalTally,
     hasLastGasp,
   });
-
-  const stats = deriveStats(lambdaHome, lambdaAway, attackHome, attackAway, homeGoals, awayGoals);
 
   return {
     id: crypto.randomUUID(),

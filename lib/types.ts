@@ -41,6 +41,9 @@ export interface CommentaryEvent {
   type: CommentaryEventType;
   text: string;
   side: Side | null;
+  // Present only for two-line "highlight" events (goals, saves, posts,
+  // last-ditch defensive plays) — SPEC.md 5.7/8.1.
+  headline?: string;
 }
 
 export type MatchStatus = "loading" | "live" | "finished";
